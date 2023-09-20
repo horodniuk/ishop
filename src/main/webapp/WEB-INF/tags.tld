@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<taglib>
+    <tlib-version>l.0</tlib-version>
+    <jsp-version>2.3</jsp-version>
+    <shortname>tags</shortname>
+    <tag>
+        <name>static</name>
+        <tag-class>com.jshop.jsp_tag.StaticTag</tag-class>
+        <body-content>empty</body-content>
+    </tag>
+
+
+    <tag>
+        <name>attr</name>
+        <tag-class>com.jshop.jsp_tag.AttrTag</tag-class>
+        <body-content>empty</body-content>
+        <attribute>
+            <name>condition</name>
+            <required>true</required>
+            <type>java.lang.Boolean</type>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+    </tag>
+
+    <tag>
+        <name>h</name>
+        <tag-class>com.jshop.jsp_tag.Htag</tag-class>
+        <body-content>scriptless</body-content>
+        <attribute>
+            <name>type</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+            <rtexprvalue>false</rtexprvalue>
+        </attribute>
+    </tag>
+
+    <tag>
+        <name>loop</name>
+        <tag-class>com.jshop.jsp_tag.LoopTag</tag-class>
+        <body-content>scriptless</body-content>
+        <attribute>
+            <name>count</name>
+            <required>true</required>
+            <type>java.lang.Integer</type>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+    </tag>
+
+    <tag>
+        <name>uppercase</name>
+        <tag-class>com.jshop.jsp_tag.UpperCaseTag</tag-class>
+        <body-content>scriptless</body-content>
+    </tag>
+
+
+</taglib>
