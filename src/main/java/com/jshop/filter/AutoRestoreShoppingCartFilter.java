@@ -2,7 +2,8 @@ package com.jshop.filter;
 
 
 import com.jshop.model.ShoppingCart;
-import com.jshop.utils.SessionUtils;
+import com.jshop.model.ShoppingCartItem;
+import com.jshop.util.SessionUtils;
 import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.Cookie;
@@ -11,16 +12,12 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-@WebFilter("/*")
-public class AutoRestoreShoppingCartFilter implements Filter {
+/*@WebFilter(filterName="AutoRestoreShoppingCartFilter")*/
+public class AutoRestoreShoppingCartFilter /*extends AbstractFilter*/ {
     private static final String SHOPPING_CART_DESERIALIZATION_DONE = "SHOPPING_CART_DESERIALIZATION_DONE";
-    @Override
-    public void init(FilterConfig filterConfig) throws ServletException {}
 
-    @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-        HttpServletRequest req = (HttpServletRequest) request;
-        HttpServletResponse resp = (HttpServletResponse) response;
+   /* @Override
+    public void doFilter(HttpServletRequest req, HttpServletResponse resp, FilterChain chain) throws IOException, ServletException {
         if(req.getSession().getAttribute(SHOPPING_CART_DESERIALIZATION_DONE) == null){
             if(!SessionUtils.isCurrentShoppingCartCreated(req)){
                 Cookie cookie = SessionUtils.findShoppingCartCookie(req);
@@ -44,13 +41,21 @@ public class AutoRestoreShoppingCartFilter implements Filter {
                 int count = Integer.parseInt(data[1]);
                 shoppingCart.addProduct(idProduct, count);
             } catch (RuntimeException e){
-
+                e.printStackTrace();
             }
         }
         return shoppingCart;
     }
 
-    @Override
-    public void destroy() {
-    }
+    protected String shoppingCartToString(ShoppingCart shoppingCart) {
+        StringBuilder res = new StringBuilder();
+        for (ShoppingCartItem shoppingCartItem : shoppingCart.getItems()) {
+            res.append(shoppingCartItem.getIdProduct()).append("-").append(shoppingCartItem.getCount()).append("|");
+        }
+        if (res.length() > 0) {
+            res.deleteCharAt(res.length() - 1);
+        }
+        return res.toString();
+    }*/
+
 }

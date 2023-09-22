@@ -3,17 +3,19 @@ package com.jshop.model;
 import com.jshop.config.Constants;
 import com.jshop.exception.ValidationException;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ShoppingCart {
     private Map<Integer, ShoppingCartItem> products = new HashMap<>();
     private int totalCount = 0;
 
 
-   public void addProduct(int idProduct, int count) throws ValidationException{
+    public void addProduct(int idProduct, int count) throws ValidationException {
         validateShoppingCartSize(idProduct);
         ShoppingCartItem item = products.get(idProduct);
-        if(item == null){
+        if (item == null) {
             validateProductCount(count);
             item = new ShoppingCartItem(idProduct, count);
             products.put(idProduct, item);
@@ -24,7 +26,7 @@ public class ShoppingCart {
         refreshStatistics();
     }
 
-    void removeProduct(Integer idProduct, int count){
+    void removeProduct(Integer idProduct, int count) {
         ShoppingCartItem shoppingCartItem = products.get(idProduct);
         if (shoppingCartItem != null) {
             if (shoppingCartItem.getCount() > count) {
@@ -37,21 +39,21 @@ public class ShoppingCart {
     }
 
     private void validateShoppingCartSize(int idProduct) {
-        if(products.size() > Constants.MAX_PRODUCTS_PER_SHOPPING_CART ||
-           (products.size() == Constants.MAX_PRODUCTS_PER_SHOPPING_CART && !products.containsKey(idProduct))) {
-            throw new ValidationException("Limit for ShoppingCart size reached: size="+products.size());
+        if (products.size() > Constants.MAX_PRODUCTS_PER_SHOPPING_CART ||
+            (products.size() == Constants.MAX_PRODUCTS_PER_SHOPPING_CART && !products.containsKey(idProduct))) {
+            throw new ValidationException("Limit for ShoppingCart size reached: size=" + products.size());
         }
     }
 
     private void validateProductCount(int count) {
-        if(count > Constants.MAX_PRODUCT_COUNT_PER_SHOPPING_CART){
-            throw new ValidationException("Limit for product count reached: count="+count);
+        if (count > Constants.MAX_PRODUCT_COUNT_PER_SHOPPING_CART) {
+            throw new ValidationException("Limit for product count reached: count=" + count);
         }
     }
 
     private void refreshStatistics() {
         totalCount = 0;
-        for (ShoppingCartItem shoppingCartItem : getItems()){
+        for (ShoppingCartItem shoppingCartItem : getItems()) {
             totalCount += shoppingCartItem.getCount();
         }
     }
@@ -60,9 +62,9 @@ public class ShoppingCart {
         return products.values();
     }
 
-    public int getTotalCount(){
+    public int getTotalCount() {
         return totalCount;
-    };
+    }
 
     @Override
     public String toString() {
@@ -71,14 +73,4 @@ public class ShoppingCart {
                ", totalCount=" + totalCount +
                '}';
     }
-
-    /*public String getView(){
-        StringBuilder sb = new StringBuilder();
-        for(ShoppingCartItem item : getItems()){
-            sb.append(item.getIdProduct()).append("&gt;").append(item.getCount()).append("<br>");
-        }
-        return sb.toString();
-    }*/
-
-
 }

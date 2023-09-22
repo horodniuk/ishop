@@ -1,12 +1,21 @@
 package com.jshop.listener;
 
 
-/*@WebListener*/
-public class AccountRequestStatisticsListener /*implements ServletRequestListener*/ {
+import com.jshop.config.Constants;
+import jakarta.servlet.ServletRequestEvent;
+import jakarta.servlet.ServletRequestListener;
+import jakarta.servlet.annotation.WebListener;
+import jakarta.servlet.http.HttpServletRequest;
 
-    /*@Override
-    public void requestDestroyed(ServletRequestEvent sre) {
-    }
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+@WebListener
+public class AccountRequestStatisticsListener implements ServletRequestListener {
+
+    @Override
+    public void requestDestroyed(ServletRequestEvent sre) {}
 
     @Override
     public void requestInitialized(ServletRequestEvent sre) {
@@ -40,5 +49,5 @@ public class AccountRequestStatisticsListener /*implements ServletRequestListene
             }
         }
         return sb.toString();
-    }*/
+    }
 }
