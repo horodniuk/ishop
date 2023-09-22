@@ -1,11 +1,17 @@
 package com.jshop.listener;
 
 
-/*@WebListener*/
-public class AccountSessionStatisticsListener /*implements HttpSessionListener*/ {
-/*    @Override
-    public void sessionCreated(HttpSessionEvent se) {
-    }
+import com.jshop.config.Constants;
+import jakarta.servlet.annotation.WebListener;
+import jakarta.servlet.http.HttpSessionEvent;
+import jakarta.servlet.http.HttpSessionListener;
+
+import java.util.List;
+
+@WebListener
+public class AccountSessionStatisticsListener implements HttpSessionListener {
+    @Override
+    public void sessionCreated(HttpSessionEvent se) {}
 
     @Override
     public void sessionDestroyed(HttpSessionEvent se) {
@@ -17,5 +23,5 @@ public class AccountSessionStatisticsListener /*implements HttpSessionListener*/
 
     private void logCurrentActionHistory(String id, List<String> actions) {
         System.out.println(id + " ->\n\t" + String.join("\n\t", actions));
-    }*/
+    }
 }
