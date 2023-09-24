@@ -10,7 +10,11 @@ public interface ProductService {
 
     List<Product> listAllProducts(int page, int limit);
 
+    int countAllProducts();
+
     List<Product> listProductsByCategory(String categoryUrl, int page, int limit);
+
+    int countProductsByCategory();
 
     List<Category> listAllCategories();
 

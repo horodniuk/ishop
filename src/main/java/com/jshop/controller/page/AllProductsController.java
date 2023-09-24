@@ -16,12 +16,12 @@ import java.util.List;
 @WebServlet("/products")
 public class AllProductsController extends AbstractController {
 
-
-
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         List<Product> products = getProductService().listAllProducts(1, Constants.MAX_PRODUCTS_PER_HTML_PAGE);
+        int totalCount = getProductService().countAllProducts();
         req.setAttribute("products", products);
+        req.setAttribute("pageCount", getPageCount(totalCount, Constants.MAX_PRODUCTS_PER_HTML_PAGE));
         RoutingUtils.forwardToPage("products.jsp", req, resp);
     }
 }

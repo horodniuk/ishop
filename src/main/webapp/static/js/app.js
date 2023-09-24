@@ -79,15 +79,23 @@
         btn.click(actionClick);
     };
 
-    var loadMoreProducts = function () {
+    var loadMoreProducts = function (){
         var btn = $('#loadMore');
         convertButtonToLoader(btn, 'btn-success');
-        var url = '/ajax/html/more' + location.pathname + '?' + location.search.substring(1);
+        var pageNumber = parseInt($('#productList').attr('data-page-number'));
+        var url = '/ajax/html/more' + location.pathname + '?page=' + (pageNumber + 1) + '&' + location.search.substring(1);
         $.ajax({
             url : url,
             success : function(html) {
-                $('#productList .text-center').prepend(html);
-                convertLoaderToButton(btn, 'btn-success', loadMoreProducts);
+                $('#productList .row').append(html);
+                pageNumber++;
+                var pageCount = parseInt($('#productList').attr('data-page-count'));
+                $('#productList').attr('data-page-number', pageNumber);
+                if(pageNumber < pageCount) {
+                    convertLoaderToButton(btn, 'btn-success', loadMoreProducts);
+                } else {
+                    btn.remove();
+                }
             },
             error : function(data) {
                 convertLoaderToButton(btn, 'btn-success', loadMoreProducts);
