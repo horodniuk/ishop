@@ -9,6 +9,12 @@ public class Constants {
 
     public static final String ACCOUNT_ACTION_HISTORY = "ACCOUNT_ACTION_HISTORY";
 
+    public static final int MAX_PRODUCTS_PER_HTML_PAGE = 12;
+
+    public static final String CATEGORY_LIST = "CATEGORY_LIST";
+
+    public static final String PRODUCER_LIST = "PRODUCER_LIST";
+
     public enum Cookie {
         SHOPPING_CART("iSCC", 60 * 60 * 24 * 365);
 

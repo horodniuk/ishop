@@ -2,6 +2,7 @@ package com.jshop.listener;
 
 
 
+import com.jshop.config.Constants;
 import com.jshop.service.impl.ServiceManager;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
@@ -18,6 +19,8 @@ public class IShopApplicationListener implements ServletContextListener {
     public void contextInitialized(ServletContextEvent sce) {
         try {
             serviceManager = ServiceManager.getInstance(sce.getServletContext());
+            sce.getServletContext().setAttribute(Constants.CATEGORY_LIST, serviceManager.getProductService().listAllCategories());
+            sce.getServletContext().setAttribute(Constants.PRODUCER_LIST, serviceManager.getProductService().listAllProducers());
         } catch (RuntimeException e) {
             LOGGER.error("Web application 'ishop' init failed: "+e.getMessage(), e);
             e.printStackTrace();
