@@ -4,6 +4,9 @@
             <pattern>%date [%thread] %highlight(%-5level) %logger{40} - %message%n</pattern>
         </encoder>
     </appender>
+
+    <logger name="com.jshop.service.impl.ProductServiceImpl" level="debug" />
+
     <logger name="org.example"/>
     <root level="INFO">
         <appender-ref ref="STDOUT"/>

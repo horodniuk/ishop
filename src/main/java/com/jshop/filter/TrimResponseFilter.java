@@ -3,6 +3,7 @@ package com.jshop.filter;
 
 import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebFilter;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpServletResponseWrapper;
 
@@ -10,11 +11,11 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
 
-//@WebFilter(filterName="TrimResponseFilter")
-public class TrimResponseFilter /*implements Filter*/ {
-  /*  @Override
-    public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain) throws IOException, ServletException {
-        TrimResponse response = new TrimResponse((HttpServletResponse) resp);
+@WebFilter(filterName="TrimResponseFilter")
+public class TrimResponseFilter extends AbstractFilter {
+   @Override
+    public void doFilter(HttpServletRequest req, HttpServletResponse resp, FilterChain chain) throws IOException, ServletException {
+        TrimResponse response = new TrimResponse(resp);
         chain.doFilter(req, response);
         response.complete();
     }
@@ -110,5 +111,5 @@ public class TrimResponseFilter /*implements Filter*/ {
             wr.flush();
             wr.close();
         }
-    }*/
+    }
 }

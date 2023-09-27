@@ -1,23 +1,25 @@
 package com.jshop.model;
 
+import com.jshop.entity.Product;
+
 public class ShoppingCartItem {
-    private int idProduct;
+    private Product product;
     private int count;
 
     public ShoppingCartItem() {
     }
 
-    public ShoppingCartItem(int idProduct, int count) {
-        this.idProduct = idProduct;
+    public ShoppingCartItem(Product product, int count) {
+        this.product = product;
         this.count = count;
     }
 
-    public int getIdProduct() {
-        return idProduct;
+    public Product getProduct() {
+        return product;
     }
 
-    public void setIdProduct(int idProduct) {
-        this.idProduct = idProduct;
+    public void setProduct(Product product) {
+        this.product = product;
     }
 
     public int getCount() {
@@ -30,9 +32,10 @@ public class ShoppingCartItem {
 
     @Override
     public String toString() {
-        return "ShoppingCartItem{" +
-               "idProduct=" + idProduct +
-               ", count=" + count +
-               '}';
+        final StringBuilder sb = new StringBuilder("ShoppingCartItem{");
+        sb.append("product=").append(product);
+        sb.append(", count=").append(count);
+        sb.append('}');
+        return sb.toString();
     }
 }

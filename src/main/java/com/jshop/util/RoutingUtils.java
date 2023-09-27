@@ -3,6 +3,7 @@ package com.jshop.util;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.json.JSONObject;
 
 import java.io.IOException;
 
@@ -24,5 +25,11 @@ public final class RoutingUtils {
 
     public static void redirect(String url,  HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.sendRedirect(url);
+    }
+
+    public static void sendJSON(JSONObject json, HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        resp.setContentType("application/json");
+        resp.getWriter().println(json.toString());
+        resp.getWriter().close();
     }
 }
