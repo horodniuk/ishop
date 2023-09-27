@@ -12,7 +12,7 @@
         <div class="panel-heading">Find products</div>
         <div class="panel-body">
             <div class="input-group">
-                <input type="text" name="query" class="form-control" placeholder="Search query">
+                <input type="text" name="query" class="form-control" placeholder="Search query" value="${searchForm.query }">
                 <span class="input-group-btn">
 					<a id="goSearch" class="btn btn-default">Go!</a>
 				</span>
@@ -21,9 +21,9 @@
                 <a data-toggle="collapse" href="#searchOptions">More filters <span class="caret"></span></a>
             </div>
         </div>
-        <div id="searchOptions" class="collapse">
-            <ishop:category-filter categories="${CATEGORY_LIST}" />
-            <ishop:producer-filter producers="${PRODUCER_LIST }" />
+        <div id="searchOptions" class="collapse ${!searchForm.categoriesEmpty or !searchForm.producersEmpty ? 'in' : '' }">
+            <ishop:category-filter categories="${CATEGORY_LIST}" searchForm="${searchForm}" />
+            <ishop:producer-filter producers="${PRODUCER_LIST }" searchForm="${searchForm}"/>
         </div>
     </div>
 </form>

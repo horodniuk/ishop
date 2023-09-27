@@ -1,5 +1,7 @@
 package com.jshop.controller;
 
+import com.jshop.form.ProductForm;
+import com.jshop.form.SearchForm;
 import com.jshop.service.OrderService;
 import com.jshop.service.ProductService;
 import com.jshop.service.impl.ServiceManager;
@@ -40,6 +42,19 @@ public abstract class AbstractController extends HttpServlet {
         } catch (NumberFormatException e) {
           return 1;
         }
+    }
+
+    public final SearchForm createSearchForm(HttpServletRequest request){
+      return new SearchForm(request.getParameter("query"),
+                            request.getParameterValues("category"),
+                            request.getParameterValues("producer")
+      );
+    }
+
+    public final ProductForm createProductForm(HttpServletRequest request){
+        return new ProductForm(
+                Integer.parseInt(request.getParameter("idProduct")),
+                Integer.parseInt(request.getParameter("count")));
     }
 
 }
