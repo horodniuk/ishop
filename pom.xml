@@ -111,6 +111,13 @@
       <version>20230227</version>
     </dependency>
 
+    <!-- https://mvnrepository.com/artifact/com.restfb/restfb -->
+    <dependency>
+      <groupId>com.restfb</groupId>
+      <artifactId>restfb</artifactId>
+      <version>1.25.0</version>
+    </dependency>
+
   </dependencies>
 
   <build>

@@ -1,5 +1,6 @@
 package com.jshop.util;
 
+import com.jshop.model.CurrentAccount;
 import com.jshop.model.ShoppingCart;
 import com.jshop.config.Constants;
 import jakarta.servlet.http.Cookie;
@@ -33,6 +34,17 @@ public class SessionUtils {
         WebUtils.setCookie(Constants.Cookie.SHOPPING_CART.getName(), cookieValue,
                 Constants.Cookie.SHOPPING_CART.getTtl(), resp);
     }
+
+    public static CurrentAccount getCurrentAccount(HttpServletRequest req) {
+        return (CurrentAccount) req.getSession().getAttribute(Constants.CURRENT_ACCOUNT);
+    }
+    public static void setCurrentAccount(HttpServletRequest req, CurrentAccount currentAccount) {
+        req.getSession().setAttribute(Constants.CURRENT_ACCOUNT, currentAccount);
+    }
+    public static boolean isCurrentAccountCreated(HttpServletRequest req) {
+        return getCurrentAccount(req) != null;
+    }
+
     private SessionUtils() {
     }
 }
