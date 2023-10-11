@@ -1,5 +1,6 @@
 package com.jshop.jdbc;
 
+import com.jshop.entity.Account;
 import com.jshop.entity.Category;
 import com.jshop.entity.Producer;
 import com.jshop.entity.Product;
@@ -39,7 +40,16 @@ public final class ResultSetHandlerFactory {
         return p;
     };
 
-    public final static <T> ResultSetHandler<T> getSingleResultSetHandler(final ResultSetHandler<T> oneRowResultSetHandler) {
+    public static final ResultSetHandler<Account> ACCOUNT_RESULT_SET_HANDLER = rs -> {
+        Account a = new Account();
+        a.setId(rs.getInt("id"));
+        a.setEmail(rs.getString("email"));
+        a.setName(rs.getString("name"));
+        return a;
+    };;
+
+
+    public static <T> ResultSetHandler<T> getSingleResultSetHandler(final ResultSetHandler<T> oneRowResultSetHandler) {
         return new ResultSetHandler<T>() {
             @Override
             public T handle(ResultSet rs) throws SQLException {

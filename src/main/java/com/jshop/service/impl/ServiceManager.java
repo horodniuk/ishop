@@ -2,6 +2,7 @@ package com.jshop.service.impl;
 
 import com.jshop.service.OrderService;
 import com.jshop.service.ProductService;
+import com.jshop.service.SocialService;
 import jakarta.servlet.ServletContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +19,7 @@ public class ServiceManager {
     private final Properties applicationProperties = new Properties();
     private final ProductService productService;
     private final OrderService orderService;
+    private final SocialService socialService;
     private final BasicDataSource dataSource;
 
     public static ServiceManager getInstance(ServletContext context) {
@@ -27,6 +29,14 @@ public class ServiceManager {
             context.setAttribute("SERVICE_MANAGER", instance);
         }
         return instance;
+    }
+
+    private ServiceManager(ServletContext context) {
+        loadApplicationProperties();
+        dataSource = createDataSource();
+        productService = new ProductServiceImpl(dataSource);
+        orderService = new OrderServiceImpl(dataSource);
+        socialService = new FacebookSocialService(this);
     }
 
     public void close() {
@@ -44,16 +54,15 @@ public class ServiceManager {
         return orderService;
     }
 
+    public SocialService getSocialService() {
+        return socialService;
+    }
+
     public String getApplicationProperty(String key) {
         return applicationProperties.getProperty(key);
     }
 
-    private ServiceManager(ServletContext context) {
-        loadApplicationProperties();
-        dataSource = createDataSource();
-        productService = new ProductServiceImpl(dataSource);
-        orderService = new OrderServiceImpl(dataSource);
-    }
+
 
     private void loadApplicationProperties(){
         try(InputStream in = ServiceManager.class.getClassLoader()

@@ -1,13 +1,16 @@
 package com.jshop.service.impl;
 
+import com.jshop.entity.Account;
 import com.jshop.entity.Product;
 import com.jshop.exception.InternalServerErrorException;
 import com.jshop.form.ProductForm;
 import com.jshop.jdbc.JDBCUtils;
 import com.jshop.jdbc.ResultSetHandler;
 import com.jshop.jdbc.ResultSetHandlerFactory;
+import com.jshop.model.CurrentAccount;
 import com.jshop.model.ShoppingCart;
 import com.jshop.model.ShoppingCartItem;
+import com.jshop.model.SocialAccount;
 import com.jshop.service.OrderService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +24,9 @@ public class OrderServiceImpl implements OrderService {
 
     private static final ResultSetHandler<Product> productResultSetHandler =
             ResultSetHandlerFactory.getSingleResultSetHandler(ResultSetHandlerFactory.PRODUCT_RESULT_SET_HANDLER);
+
+    private static final ResultSetHandler<Account> accountResultSetHandler =
+            ResultSetHandlerFactory.getSingleResultSetHandler(ResultSetHandlerFactory.ACCOUNT_RESULT_SET_HANDLER);
 
     private final DataSource dataSource;
 
@@ -75,5 +81,21 @@ public class OrderServiceImpl implements OrderService {
             }
         }
         return shoppingCart.getItems().isEmpty() ? null : shoppingCart;
+    }
+
+    @Override
+    public CurrentAccount authentificate(SocialAccount socialAccount) {
+        try (Connection c = dataSource.getConnection()) {
+            Account account = JDBCUtils.select(c, "select * from account where email=?", accountResultSetHandler, socialAccount.getEmail());
+            if (account == null) {
+                account = new Account(socialAccount.getName(), socialAccount.getEmail());
+                account = JDBCUtils.insert(c, "insert into account values (nextval('account_seq'),?,?)",
+                          accountResultSetHandler, account.getName(), account.getEmail());
+                c.commit();
+            }
+            return account;
+        } catch (SQLException e) {
+            throw new InternalServerErrorException("Can't execute SQL request: " + e.getMessage(), e);
+        }
     }
 }
