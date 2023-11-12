@@ -16,7 +16,6 @@ import java.util.List;
 @WebServlet("/products/*")
 public class ProductsByCategoryController extends AbstractController {
     private static final int SUBSTRING_INDEX = "/products".length();
-
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String categoryUrl = req.getRequestURI().substring(SUBSTRING_INDEX);
