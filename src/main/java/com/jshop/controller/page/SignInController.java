@@ -1,6 +1,7 @@
 package com.jshop.controller.page;
 
 
+import com.jshop.config.Constants;
 import com.jshop.controller.AbstractController;
 import com.jshop.util.RoutingUtils;
 import com.jshop.util.SessionUtils;
@@ -27,6 +28,10 @@ public class SignInController extends AbstractController {
         if (SessionUtils.isCurrentAccountCreated(req)) {
             RoutingUtils.redirect("/my-orders", req, resp);
         } else {
+            String targetUrl = req.getParameter("target");
+            if (targetUrl != null) {
+                req.getSession().setAttribute(Constants.SUCCESS_REDIRECT_URL_AFTER_SIGNIN, targetUrl);
+            }
             RoutingUtils.redirect(getSocialService().getAuthorizeUrl(), req, resp);
         }
     }

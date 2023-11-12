@@ -1,5 +1,6 @@
 package com.jshop.controller.page;
 
+import com.jshop.config.Constants;
 import com.jshop.controller.AbstractController;
 import com.jshop.model.CurrentAccount;
 import com.jshop.model.SocialAccount;
@@ -11,10 +12,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.net.URLDecoder;
 
 
-
-@WebServlet("/from-social")
+@WebServlet("/login/oauth2/code/google")
 public class FromSocialController extends AbstractController {
 
     @Override
@@ -24,10 +25,24 @@ public class FromSocialController extends AbstractController {
             SocialAccount socialAccount = getSocialService().getSocialAccount(code);
             CurrentAccount currentAccount = getOrderService().authentificate(socialAccount);
             SessionUtils.setCurrentAccount(req, currentAccount);
-            RoutingUtils.redirect("/my-orders", req, resp);
+            redirectToSuccessPage(req, resp);
         } else {
             LOGGER.warn("Parameter code not found");
+            if(req.getSession().getAttribute(Constants.SUCCESS_REDIRECT_URL_AFTER_SIGNIN) != null){
+                req.getSession().removeAttribute(Constants.SUCCESS_REDIRECT_URL_AFTER_SIGNIN);
+            }
             RoutingUtils.redirect("/sign-in", req, resp);
         }
     }
+
+    protected void redirectToSuccessPage(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        String targetUrl = (String) req.getSession().getAttribute(Constants.SUCCESS_REDIRECT_URL_AFTER_SIGNIN);
+        if (targetUrl != null) {
+            req.getSession().removeAttribute(Constants.SUCCESS_REDIRECT_URL_AFTER_SIGNIN);
+            RoutingUtils.redirect(URLDecoder.decode(targetUrl, "UTF-8"), req, resp);
+        } else {
+            RoutingUtils.redirect("/my-orders", req, resp);
+        }
+    }
 }
+

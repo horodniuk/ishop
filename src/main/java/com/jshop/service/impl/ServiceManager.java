@@ -3,6 +3,8 @@ package com.jshop.service.impl;
 import com.jshop.service.OrderService;
 import com.jshop.service.ProductService;
 import com.jshop.service.SocialService;
+import com.jshop.service.impl.social.FacebookSocialService;
+import com.jshop.service.impl.social.GoogleSocialService;
 import jakarta.servlet.ServletContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,12 +33,12 @@ public class ServiceManager {
         return instance;
     }
 
-    private ServiceManager(ServletContext context) {
-        loadApplicationProperties();
-        dataSource = createDataSource();
-        productService = new ProductServiceImpl(dataSource);
-        orderService = new OrderServiceImpl(dataSource);
-        socialService = new FacebookSocialService(this);
+    private ServiceManager(ServletContext context)  {
+            loadApplicationProperties();
+            dataSource = createDataSource();
+            productService = new ProductServiceImpl(dataSource);
+            orderService = new OrderServiceImpl(dataSource);
+            socialService = new GoogleSocialService(this);
     }
 
     public void close() {
