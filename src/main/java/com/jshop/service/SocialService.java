@@ -2,8 +2,10 @@ package com.jshop.service;
 
 import com.jshop.model.SocialAccount;
 
-public interface SocialService {
-    String getAuthorizeUrl();
+import java.io.IOException;
 
-    SocialAccount getSocialAccount(String authToken);
+public interface SocialService {
+    String getAuthorizeUrl() throws IOException;
+
+    SocialAccount getSocialAccount(String authToken) throws IOException;
 }

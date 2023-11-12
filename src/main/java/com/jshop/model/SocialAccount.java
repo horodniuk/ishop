@@ -1,5 +1,8 @@
 package com.jshop.model;
 
+import lombok.Getter;
+
+@Getter
 public class SocialAccount {
     private final String name;
     private final String email;
@@ -16,5 +19,4 @@ public class SocialAccount {
     public String getEmail() {
         return email;
     }
-
 }

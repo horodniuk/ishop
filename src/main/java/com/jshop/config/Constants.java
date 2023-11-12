@@ -17,6 +17,9 @@ public class Constants {
 
     public static final String CURRENT_ACCOUNT = "CURRENT_ACCOUNT";
 
+    public static final String SUCCESS_REDIRECT_URL_AFTER_SIGNIN = "SUCCESS_REDIRECT_URL_AFTER_SIGNIN";
+    public static final String CURRENT_REQUEST_URL = "CURRENT_REQUEST_URL";
+
 
     public enum Cookie {
         SHOPPING_CART("iSCC", 60 * 60 * 24 * 365);

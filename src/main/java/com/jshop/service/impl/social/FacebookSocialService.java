@@ -1,7 +1,8 @@
-package com.jshop.service.impl;
+package com.jshop.service.impl.social;
 
 import com.jshop.model.SocialAccount;
 import com.jshop.service.SocialService;
+import com.jshop.service.impl.ServiceManager;
 import com.restfb.DefaultFacebookClient;
 import com.restfb.FacebookClient;
 import com.restfb.Parameter;
@@ -16,7 +17,7 @@ public class FacebookSocialService implements SocialService {
     private final String secret;
     private final String redirectUrl;
 
-    FacebookSocialService(ServiceManager serviceManager) {
+    public FacebookSocialService(ServiceManager serviceManager) {
         super();
         idClient = serviceManager.getApplicationProperty("social.facebook.idClient");
         secret = serviceManager.getApplicationProperty("social.facebook.secret");

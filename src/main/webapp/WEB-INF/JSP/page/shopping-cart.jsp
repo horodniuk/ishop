@@ -4,6 +4,7 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 
+
 <div id="shoppingCart">
     <div class="alert alert-warning hidden-print" role="alert">To make order, please sign in</div>
     <table class="table table-bordered">
@@ -43,7 +44,7 @@
 
     <div class="row hidden-print">
         <div class="col-md-4 col-md-offset-4 col-lg-2 col-lg-offset-5">
-            <a class="btn btn-primary btn-block"><i class="fa fa-facebook-official" aria-hidden="true"></i> Sign in</a>
+            <ishop:sign-in classes="btn-block sign-in" />
         </div>
     </div>
 </div>
