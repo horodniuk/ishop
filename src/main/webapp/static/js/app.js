@@ -4,9 +4,13 @@
         $('#addToCart').click(addProductToCart);
         $('#addProductPopup .count').change(calculateCost);
         $('#loadMore').click(loadMoreProducts);
+        $('#loadMoreMyOrders').click(loadMoreMyOrders);
         initSearchForm();
         $('#goSearch').click(goSearch);
         $('.remove-product').click(removeProductFromCart);
+        $('.post-request').click(function(){
+            postRequest($(this).attr('data-url'));
+        });
     };
 
     var showAddProductPopup = function () {
@@ -30,6 +34,12 @@
     var initBuyBtn = function () {
         $(document).on('click', '.buy-btn', showAddProductPopup);
       //  $('.buy-btn').click(showAddProductPopup);
+    };
+
+    var postRequest = function(url){
+        var form = '<form id="postRequestForm" action="'+url+'" method="post"></form>';
+        $('body').append(form);
+        $('#postRequestForm').submit();
     };
 
     var addProductToCart = function (){
@@ -116,6 +126,37 @@
             }
         });
     };
+
+    var loadMoreMyOrders = function (){
+        var btn = $('#loadMoreMyOrders');
+        convertButtonToLoader(btn, 'btn-success');
+        var pageNumber = parseInt($('#myOrders').attr('data-page-number'));
+        var url = '/ajax/html/more/my-orders?page=' + (pageNumber + 1);
+        $.ajax({
+            url : url,
+            success : function(html) {
+                $('#myOrders tbody').append(html);
+                pageNumber++;
+                var pageCount = parseInt($('#myOrders').attr('data-page-count'));
+                $('#myOrders').attr('data-page-number', pageNumber);
+                if (pageNumber < pageCount) {
+                    convertLoaderToButton(btn, 'btn-success', loadMoreMyOrders);
+                } else {
+                    btn.remove();
+                }
+            },
+            error : function(xhr) {
+                convertLoaderToButton(btn, 'btn-success', loadMoreMyOrders);
+                if (xhr.status == 401) {
+                    window.location.href = '/sign-in';
+                } else {
+                    alert('Error');
+                }
+            }
+        });
+    };
+
+
     var initSearchForm = function () {
         $('#allCategories').click(function () {
             $('.categories .search-option').prop('checked', $(this).is(':checked'));

@@ -29,7 +29,7 @@ public class WebUtils {
     private WebUtils() {
     }
 
-    public static Object getCurrentRequestUrl(HttpServletRequest req) {
+    public static String getCurrentRequestUrl(HttpServletRequest req) {
         String query = req.getQueryString();
         if (query == null) {
             return req.getRequestURI();

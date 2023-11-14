@@ -11,5 +11,5 @@
         <u:urlEncode url="${CURRENT_REQUEST_URL }" var="encodedUrl"/>
         <input type="hidden" name="target" value="${encodedUrl }">
     </c:if>
-    <button type="submit" class="btn btn-primary ${classes }"><i class="fa fa-facebook-official" aria-hidden="true"></i> Sign in</button>
+    <button type="submit" class="btn btn-primary ${classes }"><i class="fa fab fa-google" aria-hidden="true"></i> Sign in</button>
 </form>
