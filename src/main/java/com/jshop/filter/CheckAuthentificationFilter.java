@@ -5,6 +5,7 @@ import com.jshop.config.Constants;
 import com.jshop.util.RoutingUtils;
 import com.jshop.util.SessionUtils;
 import com.jshop.util.UrlUtils;
+import com.jshop.util.WebUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebFilter;
@@ -21,7 +22,7 @@ public class CheckAuthentificationFilter extends AbstractFilter {
         if (SessionUtils.isCurrentAccountCreated(req)) {
             chain.doFilter(req, resp);
         } else {
-            String requestUrl = req.getRequestURI();
+            String requestUrl = WebUtils.getCurrentRequestUrl(req);
             if (UrlUtils.isAjaxUrl(requestUrl)) {
                 resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 resp.getWriter().println("401");

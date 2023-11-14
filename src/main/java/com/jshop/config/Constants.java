@@ -7,6 +7,8 @@ public class Constants {
 
     public static final int MAX_PRODUCTS_PER_SHOPPING_CART = 20;
 
+    public static final int ORDERS_PER_PAGE = 5;
+
     public static final String ACCOUNT_ACTION_HISTORY = "ACCOUNT_ACTION_HISTORY";
 
     public static final int MAX_PRODUCTS_PER_HTML_PAGE = 12;

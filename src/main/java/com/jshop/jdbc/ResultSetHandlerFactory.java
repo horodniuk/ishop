@@ -1,9 +1,6 @@
 package com.jshop.jdbc;
 
-import com.jshop.entity.Account;
-import com.jshop.entity.Category;
-import com.jshop.entity.Producer;
-import com.jshop.entity.Product;
+import com.jshop.entity.*;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -11,6 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class ResultSetHandlerFactory {
+
+    private ResultSetHandlerFactory() {
+    }
+
     public final static ResultSetHandler<Product> PRODUCT_RESULT_SET_HANDLER = rs -> {
         Product p = new Product();
         p.setCategory(rs.getString("category"));
@@ -85,6 +86,23 @@ public final class ResultSetHandlerFactory {
         };
     }
 
-    private ResultSetHandlerFactory() {
-    }
+    public final static ResultSetHandler<OrderItem> ORDER_ITEM_RESULT_SET_HANDLER = rs -> {
+        OrderItem orderItem = new OrderItem();
+        orderItem.setId(rs.getLong("oid"));
+        orderItem.setCount(rs.getInt("count"));
+        orderItem.setIdOrder(rs.getLong("id_order"));
+        Product product = PRODUCT_RESULT_SET_HANDLER.handle(rs);
+        orderItem.setProduct(product);
+        return orderItem;
+    };
+
+    public final static ResultSetHandler<Order> ORDER_RESULT_SET_HANDLER = rs -> {
+        Order order = new Order();
+        order.setId(rs.getLong("id"));
+        order.setCreated(rs.getTimestamp("created"));
+        order.setIdAccount(rs.getInt("id_account"));
+        return order;
+    };
+
+
 }

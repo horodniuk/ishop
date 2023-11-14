@@ -21,7 +21,7 @@
                 <a data-toggle="collapse" href="#searchOptions">More filters <span class="caret"></span></a>
             </div>
         </div>
-        <div id="searchOptions" class="collapse ${!searchForm.categoriesEmpty or !searchForm.producersEmpty ? 'in' : '' }">
+        <div id="searchOptions" class="collapse ${searchForm.categoriesNotEmpty or searchForm.producersNotEmpty ? 'in' : '' }">
             <ishop:category-filter categories="${CATEGORY_LIST}" searchForm="${searchForm}" />
             <ishop:producer-filter producers="${PRODUCER_LIST }" searchForm="${searchForm}"/>
         </div>

@@ -1,10 +1,8 @@
-package com.jshop.controller.page;
-
+package com.jshop.controller.ajax;
 
 import com.jshop.config.Constants;
 import com.jshop.controller.AbstractController;
 import com.jshop.entity.Order;
-import com.jshop.model.CurrentAccount;
 import com.jshop.util.RoutingUtils;
 import com.jshop.util.SessionUtils;
 import jakarta.servlet.ServletException;
@@ -15,16 +13,14 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
-@WebServlet("/my-orders")
-public class MyOrdersController extends AbstractController {
+@WebServlet("/ajax/html/more/my-orders")
+public class MyOrdersMoreController extends AbstractController {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        CurrentAccount currentAccount = SessionUtils.getCurrentAccount(req);
-        List<Order> orders = getOrderService().listMyOrders(currentAccount, 1, Constants.ORDERS_PER_PAGE);
+        List<Order> orders = getOrderService().listMyOrders(SessionUtils.getCurrentAccount(req), getPage(req), Constants.ORDERS_PER_PAGE);
         req.setAttribute("orders", orders);
-        int orderCount = getOrderService().countMyOrders(currentAccount);
-        req.setAttribute("pageCount", getPageCount(orderCount, Constants.ORDERS_PER_PAGE));
-        RoutingUtils.forwardToPage("my-orders.jsp", req, resp);
+        RoutingUtils.forwardToFragment("my-orders-tbody.jsp", req, resp);
     }
+
 }

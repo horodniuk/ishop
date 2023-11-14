@@ -35,7 +35,7 @@
                     <ul class="nav navbar-nav navbar-right">
                         <li><a>Welcome ${CURRENT_ACCOUNT.description }</a></li>
                         <li><a href="/my-orders">My orders</a></li>
-                        <li><a href="/sign-out">Sign out</a></li>
+                        <li><a href="javascript:void(0);" class="post-request" data-url="/sign-out">Sign out</a></li>
                     </ul>
                 </c:when>
                 <c:when test="${CURRENT_REQUEST_URL != '/sign-in' and CURRENT_REQUEST_URL != '/shopping-cart' }">
