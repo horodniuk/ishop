@@ -41,13 +41,12 @@
 </head>
 <body>
 <div class="alert alert-danger hidden-print" role="alert">
-    <h1>Code: ${statusCode }</h1>
+    <h1>Code: ${statusCode}</h1>
     <c:choose>
         <c:when test="${statusCode == 403}">You don't have permissions to view this resource</c:when>
         <c:when test="${statusCode == 404}">
 
             <div class="container">
-                <h1>404 - Page Not Found</h1>
                 <p>The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.</p>
                 <p>Return to the <a href="/">home page</a>.</p>
             </div>

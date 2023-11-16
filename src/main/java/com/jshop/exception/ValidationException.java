@@ -1,7 +1,10 @@
 package com.jshop.exception;
 
-public class ValidationException extends IllegalArgumentException {
-    public ValidationException(String message) {
-        super(message);
+import jakarta.servlet.http.HttpServletResponse;
+
+public class ValidationException extends AbstractApplicationException {
+
+    public ValidationException(String s) {
+        super(s, HttpServletResponse.SC_BAD_REQUEST);
     }
 }

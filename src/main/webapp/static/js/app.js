@@ -61,9 +61,13 @@
                 convertLoaderToButton(btn, 'btn-primary', addProductToCart);
                 $('#addProductPopup').modal('hide');
             },
-            error : function(data) {
+            error : function(xhr) {
                 convertLoaderToButton(btn, 'btn-primary', addProductToCart);
-                alert('Error');
+                if (xhr.status == 400) {
+                    alert(xhr.responseJSON.message);
+                } else {
+                    alert('Error');
+                }
             }
         });
     };
