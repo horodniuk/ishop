@@ -32,4 +32,10 @@ public final class RoutingUtils {
         resp.getWriter().println(json.toString());
         resp.getWriter().close();
     }
+
+    public static void sendHTMLFragment(String internalError, HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        resp.setContentType("text/html");
+        resp.getWriter().println(internalError);
+        resp.getWriter().close();
+    }
 }

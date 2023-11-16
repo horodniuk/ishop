@@ -1,8 +1,10 @@
 package com.jshop.exception;
 
-public class ResourceNotFoundException extends IllegalArgumentException {
+import jakarta.servlet.http.HttpServletResponse;
 
-    public ResourceNotFoundException(String message) {
-        super(message);
+public class ResourceNotFoundException extends AbstractApplicationException {
+
+    public ResourceNotFoundException(String s) {
+        super(s, HttpServletResponse.SC_NOT_FOUND);
     }
 }

@@ -25,7 +25,7 @@ public class CheckAuthentificationFilter extends AbstractFilter {
             String requestUrl = WebUtils.getCurrentRequestUrl(req);
             if (UrlUtils.isAjaxUrl(requestUrl)) {
                 resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                resp.getWriter().println("401");
+                RoutingUtils.sendHTMLFragment("401", req, resp);
             } else {
                 req.getSession().setAttribute(Constants.SUCCESS_REDIRECT_URL_AFTER_SIGNIN, requestUrl);
                 RoutingUtils.redirect("/sign-in", req, resp);
