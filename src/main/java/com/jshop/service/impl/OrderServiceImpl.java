@@ -16,6 +16,9 @@ import com.jshop.model.ShoppingCart;
 import com.jshop.model.ShoppingCartItem;
 import com.jshop.model.SocialAccount;
 import com.jshop.service.OrderService;
+
+import org.apache.commons.mail.DefaultAuthenticator;
+import org.apache.commons.mail.SimpleEmail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,9 +55,24 @@ public class OrderServiceImpl implements OrderService {
 
     private final DataSource dataSource;
 
-    public OrderServiceImpl(DataSource dataSource) {
+    private String smtpHost;
+    private String smtpPort;
+    private String smtpUsername;
+    private String smtpPassword;
+    private String host;
+    private String fromAddress;
+
+    public OrderServiceImpl(DataSource dataSource, ServiceManager serviceManager) {
         super();
         this.dataSource = dataSource;
+        this.smtpHost = serviceManager.getApplicationProperty("email.smtp.server");
+        this.smtpPort = serviceManager.getApplicationProperty("email.smtp.port");
+        this.smtpUsername = serviceManager.getApplicationProperty("email.smtp.username");
+        this.smtpPassword = serviceManager.getApplicationProperty("email.smtp.password");
+        this.host = serviceManager.getApplicationProperty("app.host");
+        this.fromAddress = serviceManager.getApplicationProperty("email.smtp.fromAddress");
+        System.out.println("smtpUsername " + smtpUsername);
+        System.out.println("smtpPassword " + smtpPassword);
     }
 
     @Override
@@ -134,9 +152,28 @@ public class OrderServiceImpl implements OrderService {
                     "insert into order_item values(nextval('order_item_seq'),?,?,?)",
                      toOrderItemParameterList(order.getId(), shoppingCart.getItems()));
             c.commit();
+            sendEmail(currentAccount.getEmail(), order);
             return order.getId();
         } catch (SQLException e) {
             throw new InternalServerErrorException("Can't execute SQL request: " + e.getMessage(), e);
+        }
+    }
+
+    private void sendEmail(String emailAddress, Order order) {
+        try {
+            SimpleEmail email = new SimpleEmail();
+            email.setCharset("utf-8");
+            email.setHostName(smtpHost);
+            email.setSSLOnConnect(true);
+            email.setSslSmtpPort(smtpPort);
+            email.setFrom(fromAddress);
+            email.setAuthenticator(new DefaultAuthenticator(smtpUsername, smtpPassword));
+            email.setSubject("New order");
+            email.setMsg(host + "/order?id=" + order.getId());
+            email.addTo(emailAddress);
+            email.send();
+        } catch (Exception e) {
+            LOGGER.error("Error during send email: " + e.getMessage(), e);
         }
     }
 
