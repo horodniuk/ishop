@@ -37,7 +37,7 @@ public class ServiceManager {
             loadApplicationProperties();
             dataSource = createDataSource();
             productService = new ProductServiceImpl(dataSource);
-            orderService = new OrderServiceImpl(dataSource);
+            orderService = new OrderServiceImpl(dataSource, this);
             socialService = new GoogleSocialService(this);
     }
 
@@ -61,7 +61,13 @@ public class ServiceManager {
     }
 
     public String getApplicationProperty(String key) {
-        return applicationProperties.getProperty(key);
+        String value = applicationProperties.getProperty(key);
+        if(value.startsWith("${sysEnv.")) {
+            String keyVal = value.replace("${sysEnv.", "").replace("}", "");
+            value = System.getenv(keyVal);
+        }
+        System.out.println(value);
+        return value;
     }
 
 
