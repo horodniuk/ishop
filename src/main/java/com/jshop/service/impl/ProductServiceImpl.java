@@ -1,15 +1,16 @@
 package com.jshop.service.impl;
 
+import com.jshop.framework.handler.DefaultListResultSetHandler;
+import com.jshop.framework.handler.IntResultSetHandler;
+import com.jshop.framework.handler.ResultSetHandler;
 import com.jshop.entity.Category;
 import com.jshop.entity.Producer;
 import com.jshop.entity.Product;
 import com.jshop.exception.InternalServerErrorException;
 import com.jshop.form.SearchForm;
+
 import com.jshop.jdbc.JDBCUtils;
-import com.jshop.jdbc.ResultSetHandler;
-import com.jshop.jdbc.ResultSetHandlerFactory;
 import com.jshop.jdbc.SearchQuery;
-import com.jshop.service.OrderService;
 import com.jshop.service.ProductService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,15 +24,12 @@ import java.util.List;
 public class ProductServiceImpl implements ProductService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProductServiceImpl.class);
 
-    private static final ResultSetHandler<List<Product>> productsResultSetHandler =
-            ResultSetHandlerFactory.getListResultSetHandler(ResultSetHandlerFactory.PRODUCT_RESULT_SET_HANDLER);
+    private final ResultSetHandler<List<Product>> productsResultSetHandler = new DefaultListResultSetHandler<>(Product.class);
+    private final ResultSetHandler<List<Category>> categoryListResultSetHandler = new DefaultListResultSetHandler<>(Category.class);
+    private final ResultSetHandler<List<Producer>> producerListResultSetHandler = new DefaultListResultSetHandler<>(Producer.class);
+    private final ResultSetHandler<Integer> countResultSetHandler = new IntResultSetHandler<>();
 
-    public static final ResultSetHandler<List<Category>> categoryListResultSetHandler =
-            ResultSetHandlerFactory.getListResultSetHandler(ResultSetHandlerFactory.CATEGORY_RESULT_SET_HANDLER);
 
-    public static final ResultSetHandler<List<Producer>> producerListResultSetHandler =
-            ResultSetHandlerFactory.getListResultSetHandler(ResultSetHandlerFactory.PRODUCER_RESULT_SET_HANDLER);
-    public static final ResultSetHandler<Integer> countResultSetHandler = ResultSetHandlerFactory.getCountResultSetHandler();
 
     private final DataSource dataSource;
 
@@ -45,7 +43,7 @@ public class ProductServiceImpl implements ProductService {
         try (Connection c = dataSource.getConnection()) {
             int offset = (page - 1) * limit;
             return JDBCUtils.select(c, "select p.*, c.name as category, pr.name as producer " +
-                                       "from product p, producer pr, category c "+
+                                       "from product p, producer pr, category c " +
                                        "where c.id=p.id_category and pr.id=p.id_producer" +
                                        " limit ? offset ?",
                                         productsResultSetHandler, limit, offset);

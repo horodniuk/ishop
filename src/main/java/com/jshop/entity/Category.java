@@ -1,9 +1,15 @@
 package com.jshop.entity;
 
+import com.jshop.framework.annotation.jdbc.Column;
+
 public class Category extends AbstractEntity<Integer> {
     private String name;
     private String url;
+    @Column("product_count")
     private Integer productCount;
+
+    public Category() {
+    }
 
     public String getName() {
         return name;

@@ -1,9 +1,14 @@
 package com.jshop.entity;
 
+import com.jshop.framework.annotation.jdbc.Child;
+import com.jshop.framework.annotation.jdbc.Column;
+
 public class OrderItem extends AbstractEntity<Long>{
+    @Column("id_order")
     private Long idOrder;
+    @Child(columnName="pid")
     private Product product;
-    private int count;
+    private Integer count;
 
     public OrderItem(Product product, int count) {
         super();
@@ -30,11 +35,11 @@ public class OrderItem extends AbstractEntity<Long>{
         this.product = product;
     }
 
-    public int getCount() {
+    public Integer getCount() {
         return count;
     }
 
-    public void setCount(int count) {
+    public void setCount(Integer count) {
         this.count = count;
     }
 
