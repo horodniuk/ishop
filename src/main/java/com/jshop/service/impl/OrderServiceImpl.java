@@ -1,5 +1,9 @@
 package com.jshop.service.impl;
 
+import com.jshop.framework.handler.DefaultListResultSetHandler;
+import com.jshop.framework.handler.DefaultUniqueResultSetHandler;
+import com.jshop.framework.handler.IntResultSetHandler;
+import com.jshop.framework.handler.ResultSetHandler;
 import com.jshop.entity.Account;
 import com.jshop.entity.Order;
 import com.jshop.entity.OrderItem;
@@ -9,8 +13,7 @@ import com.jshop.exception.InternalServerErrorException;
 import com.jshop.exception.ResourceNotFoundException;
 import com.jshop.form.ProductForm;
 import com.jshop.jdbc.JDBCUtils;
-import com.jshop.jdbc.ResultSetHandler;
-import com.jshop.jdbc.ResultSetHandlerFactory;
+
 import com.jshop.model.CurrentAccount;
 import com.jshop.model.ShoppingCart;
 import com.jshop.model.ShoppingCartItem;
@@ -34,23 +37,12 @@ import java.util.List;
 public class OrderServiceImpl implements OrderService {
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderServiceImpl.class);
 
-    private static final ResultSetHandler<Product> productResultSetHandler =
-            ResultSetHandlerFactory.getSingleResultSetHandler(ResultSetHandlerFactory.PRODUCT_RESULT_SET_HANDLER);
-
-    private static final ResultSetHandler<Account> accountResultSetHandler =
-            ResultSetHandlerFactory.getSingleResultSetHandler(ResultSetHandlerFactory.ACCOUNT_RESULT_SET_HANDLER);
-
-    private final ResultSetHandler<Order> orderResultSetHandler =
-            ResultSetHandlerFactory.getSingleResultSetHandler(ResultSetHandlerFactory.ORDER_RESULT_SET_HANDLER);
-
-    private final ResultSetHandler<List<OrderItem>> orderItemListResultSetHandler =
-            ResultSetHandlerFactory.getListResultSetHandler(ResultSetHandlerFactory.ORDER_ITEM_RESULT_SET_HANDLER);
-
-    private final ResultSetHandler<List<Order>> ordersResultSetHandler =
-            ResultSetHandlerFactory.getListResultSetHandler(ResultSetHandlerFactory.ORDER_RESULT_SET_HANDLER);
-
-    private final ResultSetHandler<Integer> countResultSetHandler =
-            ResultSetHandlerFactory.getCountResultSetHandler();
+    private final ResultSetHandler<Product> productResultSetHandler = new DefaultUniqueResultSetHandler<>(Product.class);
+    private final ResultSetHandler<Account> accountResultSetHandler = new DefaultUniqueResultSetHandler<>(Account.class);
+    private final ResultSetHandler<Order> orderResultSetHandler = new DefaultUniqueResultSetHandler<>(Order.class);
+    private final ResultSetHandler<List<OrderItem>> orderItemListResultSetHandler = new DefaultListResultSetHandler<>(OrderItem.class);
+    private final ResultSetHandler<List<Order>> ordersResultSetHandler = new DefaultListResultSetHandler<>(Order.class);
+    private final ResultSetHandler<Integer> countResultSetHandler = new IntResultSetHandler<>();
 
 
     private final DataSource dataSource;
@@ -71,8 +63,6 @@ public class OrderServiceImpl implements OrderService {
         this.smtpPassword = serviceManager.getApplicationProperty("email.smtp.password");
         this.host = serviceManager.getApplicationProperty("app.host");
         this.fromAddress = serviceManager.getApplicationProperty("email.smtp.fromAddress");
-        System.out.println("smtpUsername " + smtpUsername);
-        System.out.println("smtpPassword " + smtpPassword);
     }
 
     @Override
@@ -152,7 +142,7 @@ public class OrderServiceImpl implements OrderService {
                     "insert into order_item values(nextval('order_item_seq'),?,?,?)",
                      toOrderItemParameterList(order.getId(), shoppingCart.getItems()));
             c.commit();
-            sendEmail(currentAccount.getEmail(), order);
+           // sendEmail(currentAccount.getEmail(), order);
             return order.getId();
         } catch (SQLException e) {
             throw new InternalServerErrorException("Can't execute SQL request: " + e.getMessage(), e);
@@ -188,13 +178,8 @@ public class OrderServiceImpl implements OrderService {
                 throw new AccessDeniedException("Account with id=" + currentAccount.getId() + " is not owner for order with id=" + id);
             }
             List<OrderItem> list = JDBCUtils.select(c,
-                    "select" +
-                    " o.id as oid," +
-                    " o.id_order as id_order," +
-                    " o.id_product, o.count, p.*," +
-                    " c.name as category, pr.name as producer "
-                    + "from order_item o, product p, category c, producer pr "
-                    + "where pr.id=p.id_producer and c.id=p.id_category and o.id_product=p.id and o.id_order=?",
+                    "select o.id, o.id_order as id_order, o.id_product, o.count, p.id as pid, p.name, p.description, p.price, p.image_link, c.name as category, pr.name as producer from order_item o, product p, category c, producer pr " +
+                    "where pr.id=p.id_producer and c.id=p.id_category and o.id_product=p.id and o.id_order=?",
                     orderItemListResultSetHandler, id);
             order.setItems(list);
             return order;

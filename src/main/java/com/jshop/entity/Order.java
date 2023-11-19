@@ -1,13 +1,21 @@
 package com.jshop.entity;
 
+import com.jshop.framework.annotation.jdbc.Column;
+import com.jshop.framework.annotation.jdbc.Transient;
+
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.List;
 
 public class Order extends AbstractEntity<Long>{
+    @Column("id_account")
     private Integer idAccount;
+    @Transient
     private List<OrderItem> items;
     private Timestamp created;
+
+    public Order() {
+    }
 
     public Integer getIdAccount() {
         return idAccount;

@@ -66,7 +66,6 @@ public class ServiceManager {
             String keyVal = value.replace("${sysEnv.", "").replace("}", "");
             value = System.getenv(keyVal);
         }
-        System.out.println(value);
         return value;
     }
 
