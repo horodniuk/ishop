@@ -1,9 +1,5 @@
 package com.jshop.service.impl;
 
-import com.jshop.framework.handler.DefaultListResultSetHandler;
-import com.jshop.framework.handler.DefaultUniqueResultSetHandler;
-import com.jshop.framework.handler.IntResultSetHandler;
-import com.jshop.framework.handler.ResultSetHandler;
 import com.jshop.entity.Account;
 import com.jshop.entity.Order;
 import com.jshop.entity.OrderItem;
@@ -12,23 +8,24 @@ import com.jshop.exception.AccessDeniedException;
 import com.jshop.exception.InternalServerErrorException;
 import com.jshop.exception.ResourceNotFoundException;
 import com.jshop.form.ProductForm;
+import com.jshop.framework.annotation.jdbc.Transactional;
+import com.jshop.framework.factory.JDBCConnectionUtils;
+import com.jshop.framework.handler.DefaultListResultSetHandler;
+import com.jshop.framework.handler.DefaultUniqueResultSetHandler;
+import com.jshop.framework.handler.IntResultSetHandler;
+import com.jshop.framework.handler.ResultSetHandler;
 import com.jshop.jdbc.JDBCUtils;
-
 import com.jshop.model.CurrentAccount;
 import com.jshop.model.ShoppingCart;
 import com.jshop.model.ShoppingCartItem;
 import com.jshop.model.SocialAccount;
 import com.jshop.service.OrderService;
-
 import org.apache.commons.mail.DefaultAuthenticator;
 import org.apache.commons.mail.SimpleEmail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
-
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -44,9 +41,6 @@ public class OrderServiceImpl implements OrderService {
     private final ResultSetHandler<List<Order>> ordersResultSetHandler = new DefaultListResultSetHandler<>(Order.class);
     private final ResultSetHandler<Integer> countResultSetHandler = new IntResultSetHandler<>();
 
-
-    private final DataSource dataSource;
-
     private String smtpHost;
     private String smtpPort;
     private String smtpUsername;
@@ -54,9 +48,8 @@ public class OrderServiceImpl implements OrderService {
     private String host;
     private String fromAddress;
 
-    public OrderServiceImpl(DataSource dataSource, ServiceManager serviceManager) {
+    public OrderServiceImpl(ServiceManager serviceManager) {
         super();
-        this.dataSource = dataSource;
         this.smtpHost = serviceManager.getApplicationProperty("email.smtp.server");
         this.smtpPort = serviceManager.getApplicationProperty("email.smtp.port");
         this.smtpUsername = serviceManager.getApplicationProperty("email.smtp.username");
@@ -66,18 +59,15 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional
     public void addProductToShoppingCart(ProductForm productForm, ShoppingCart shoppingCart) {
-        try (Connection c = dataSource.getConnection()) {
-            Product product = JDBCUtils.select(c, "select p.*, c.name as category, pr.name as producer from product p, producer pr, category c "
-                                                  + "where c.id=p.id_category and pr.id=p.id_producer and p.id=?",
-                    productResultSetHandler, productForm.getIdProduct());
-            if (product == null) {
-                throw new InternalServerErrorException("Product not found by id=" + productForm.getIdProduct());
-            }
-            shoppingCart.addProduct(product, productForm.getCount());
-        } catch (SQLException e) {
-            throw new InternalServerErrorException("Can't execute sql query: " + e.getMessage(), e);
+        Product product = JDBCUtils.select(JDBCConnectionUtils.getCurrentConnection(), "select p.*, c.name as category, pr.name as producer from product p, producer pr, category c "
+                                              + "where c.id=p.id_category and pr.id=p.id_producer and p.id=?",
+                productResultSetHandler, productForm.getIdProduct());
+        if (product == null) {
+            throw new InternalServerErrorException("Product not found by id=" + productForm.getIdProduct());
         }
+        shoppingCart.addProduct(product, productForm.getCount());
     }
 
     @Override
@@ -98,6 +88,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional
     public ShoppingCart deserializeShoppingCart(String string) {
         ShoppingCart shoppingCart = new ShoppingCart();
         String[] items = string.split("\\|");
@@ -115,38 +106,30 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional(readOnly=false)
     public CurrentAccount authentificate(SocialAccount socialAccount) {
-        try (Connection c = dataSource.getConnection()) {
-            Account account = JDBCUtils.select(c, "select * from account where email=?", accountResultSetHandler, socialAccount.getEmail());
+            Account account = JDBCUtils.select(JDBCConnectionUtils.getCurrentConnection(), "select * from account where email=?", accountResultSetHandler, socialAccount.getEmail());
             if (account == null) {
                 account = new Account(socialAccount.getName(), socialAccount.getEmail());
-                account = JDBCUtils.insert(c, "insert into account values (nextval('account_seq'),?,?)",
+                account = JDBCUtils.insert(JDBCConnectionUtils.getCurrentConnection(), "insert into account values (nextval('account_seq'),?,?)",
                         accountResultSetHandler, account.getName(), account.getEmail());
-                c.commit();
             }
             return account;
-        } catch (SQLException e) {
-            throw new InternalServerErrorException("Can't execute SQL request: " + e.getMessage(), e);
-        }
     }
 
     @Override
+    @Transactional(readOnly=false)
     public long makeOrder(ShoppingCart shoppingCart, CurrentAccount currentAccount) {
         if (shoppingCart == null || shoppingCart.getItems().isEmpty()) {
             throw new InternalServerErrorException("shoppingCart is null or empty");
         }
-        try (Connection c = dataSource.getConnection()) {
-            Order order = JDBCUtils.insert(c, "insert into \"order\" values(nextval('order_seq'),?,?)", orderResultSetHandler,
-                    currentAccount.getId(), new Timestamp(System.currentTimeMillis()));
-            JDBCUtils.insertBatch(c,
-                    "insert into order_item values(nextval('order_item_seq'),?,?,?)",
-                     toOrderItemParameterList(order.getId(), shoppingCart.getItems()));
-            c.commit();
-           // sendEmail(currentAccount.getEmail(), order);
-            return order.getId();
-        } catch (SQLException e) {
-            throw new InternalServerErrorException("Can't execute SQL request: " + e.getMessage(), e);
-        }
+        Order order = JDBCUtils.insert(JDBCConnectionUtils.getCurrentConnection(), "insert into \"order\" values(nextval('order_seq'),?,?)", orderResultSetHandler,
+                currentAccount.getId(), new Timestamp(System.currentTimeMillis()));
+        JDBCUtils.insertBatch(JDBCConnectionUtils.getCurrentConnection(),
+                "insert into order_item values(nextval('order_item_seq'),?,?,?)",
+                toOrderItemParameterList(order.getId(), shoppingCart.getItems()));
+        // sendEmail(currentAccount.getEmail(), order);
+        return order.getId();
     }
 
     private void sendEmail(String emailAddress, Order order) {
@@ -168,45 +151,37 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional
     public Order findOrderById(long id, CurrentAccount currentAccount) {
-        try (Connection c = dataSource.getConnection()) {
-            Order order = JDBCUtils.select(c, "select * from \"order\" where id=?", orderResultSetHandler, id);
-            if (order == null) {
-                throw new ResourceNotFoundException("Order not found by id: " + id);
-            }
-            if (!order.getIdAccount().equals(currentAccount.getId())) {
-                throw new AccessDeniedException("Account with id=" + currentAccount.getId() + " is not owner for order with id=" + id);
-            }
-            List<OrderItem> list = JDBCUtils.select(c,
-                    "select o.id, o.id_order as id_order, o.id_product, o.count, p.id as pid, p.name, p.description, p.price, p.image_link, c.name as category, pr.name as producer from order_item o, product p, category c, producer pr " +
-                    "where pr.id=p.id_producer and c.id=p.id_category and o.id_product=p.id and o.id_order=?",
-                    orderItemListResultSetHandler, id);
-            order.setItems(list);
-            return order;
-        } catch (SQLException e) {
-            throw new InternalServerErrorException("Can't execute SQL request: " + e.getMessage(), e);
+        Order order = JDBCUtils.select(JDBCConnectionUtils.getCurrentConnection(), "select * from \"order\" where id=?", orderResultSetHandler, id);
+        if (order == null) {
+            throw new ResourceNotFoundException("Order not found by id: " + id);
         }
+        if (!order.getIdAccount().equals(currentAccount.getId())) {
+            throw new AccessDeniedException("Account with id=" + currentAccount.getId() + " is not owner for order with id=" + id);
+        }
+        List<OrderItem> list = JDBCUtils.select(JDBCConnectionUtils.getCurrentConnection(),
+                "select o.id, o.id_order as id_order, o.id_product, o.count, p.id as pid, p.name, p.description, p.price, p.image_link, c.name as category, pr.name as producer from order_item o, product p, category c, producer pr " +
+                "where pr.id=p.id_producer and c.id=p.id_category and o.id_product=p.id and o.id_order=?",
+                orderItemListResultSetHandler, id);
+        order.setItems(list);
+        return order;
     }
 
     @Override
+    @Transactional
     public List<Order> listMyOrders(CurrentAccount currentAccount, int page, int limit) {
         int offset = (page - 1) * limit;
-        try (Connection c = dataSource.getConnection()) {
-            List<Order> orders = JDBCUtils.select(c, "select * from \"order\" where id_account=? order by id desc limit ? offset ?",
-                    ordersResultSetHandler, currentAccount.getId(), limit, offset);
-            return orders;
-        } catch (SQLException e) {
-            throw new InternalServerErrorException("Can't execute SQL request: " + e.getMessage(), e);
-        }
+        List<Order> orders = JDBCUtils.select(JDBCConnectionUtils.getCurrentConnection(), "select * from \"order\" where id_account=? order by id desc limit ? offset ?",
+                ordersResultSetHandler, currentAccount.getId(), limit, offset);
+        return orders;
     }
 
     @Override
+    @Transactional
     public int countMyOrders(CurrentAccount currentAccount) {
-        try (Connection c = dataSource.getConnection()) {
-            return JDBCUtils.select(c, "select count(*) from \"order\" where id_account= ? ", countResultSetHandler, currentAccount.getId());
-        } catch (SQLException e) {
-            throw new InternalServerErrorException("Can't execute SQL request: " + e.getMessage(), e);
-        }
+        return JDBCUtils.select(JDBCConnectionUtils.getCurrentConnection(), "select count(*) from \"order\" where id_account= ? ",
+                countResultSetHandler, currentAccount.getId());
     }
 
     private List<Object[]> toOrderItemParameterList(long idOrder, Collection<ShoppingCartItem> items) {
