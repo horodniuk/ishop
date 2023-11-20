@@ -5,9 +5,12 @@ import com.jshop.framework.annotation.jdbc.Column;
 import com.jshop.framework.annotation.jdbc.Transient;
 import com.jshop.framework.exception.FrameworkSystemException;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class ReflectionUtils {
@@ -49,5 +52,21 @@ public class ReflectionUtils {
             }
         }
         throw new FrameworkSystemException("Field " + fieldName + " not found for class: " + fieldClass);
+    }
+
+    public static Method findMethod(Method method, Class<?> classInstance) {
+        for (Method m : classInstance.getDeclaredMethods()) {
+            if (m.getName().equals(method.getName()) && Arrays.equals(m.getParameterTypes(), method.getParameterTypes())) {
+                return m;
+            }
+        }
+        throw new FrameworkSystemException("Can't find method " + method + " in the " + classInstance);
+    }
+    public static <T extends Annotation> T findConfigAnnotation(Method method, Class<T> annotationClass) {
+        T annotation = method.getAnnotation(annotationClass);
+        if (annotation == null) {
+            annotation = method.getDeclaringClass().getAnnotation(annotationClass);
+        }
+        return annotation;
     }
 }

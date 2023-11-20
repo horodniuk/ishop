@@ -1,11 +1,12 @@
 package com.jshop.service.impl;
 
+import com.jshop.framework.factory.JDBCTransactionalServiceFactory;
 import com.jshop.service.OrderService;
 import com.jshop.service.ProductService;
 import com.jshop.service.SocialService;
-import com.jshop.service.impl.social.FacebookSocialService;
 import com.jshop.service.impl.social.GoogleSocialService;
 import jakarta.servlet.ServletContext;
+import org.apache.commons.dbcp2.BasicDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,7 +14,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.Properties;
-import org.apache.commons.dbcp2.BasicDataSource;
 
 
 public class ServiceManager {
@@ -33,25 +33,26 @@ public class ServiceManager {
         return instance;
     }
 
-    private ServiceManager(ServletContext context)  {
-            loadApplicationProperties();
-            dataSource = createDataSource();
-            productService = new ProductServiceImpl(dataSource);
-            orderService = new OrderServiceImpl(dataSource, this);
-            socialService = new GoogleSocialService(this);
+    private ServiceManager(ServletContext context) {
+        loadApplicationProperties();
+        dataSource = createDataSource();
+        productService = (ProductService) JDBCTransactionalServiceFactory.createTransactionalService(dataSource, new ProductServiceImpl()) ;
+        orderService = (OrderService) JDBCTransactionalServiceFactory.createTransactionalService(dataSource, new OrderServiceImpl(this));
+        socialService = new GoogleSocialService(this);
     }
 
     public void close() {
         try {
             dataSource.close();
         } catch (SQLException e) {
-            LOGGER.error("Close datasource failed: "+e.getMessage(), e);
+            LOGGER.error("Close datasource failed: " + e.getMessage(), e);
         }
     }
 
     public ProductService getProductService() {
         return productService;
     }
+
     public OrderService getOrderService() {
         return orderService;
     }
@@ -62,17 +63,15 @@ public class ServiceManager {
 
     public String getApplicationProperty(String key) {
         String value = applicationProperties.getProperty(key);
-        if(value.startsWith("${sysEnv.")) {
+        if (value.startsWith("${sysEnv.")) {
             String keyVal = value.replace("${sysEnv.", "").replace("}", "");
             value = System.getenv(keyVal);
         }
         return value;
     }
 
-
-
-    private void loadApplicationProperties(){
-        try(InputStream in = ServiceManager.class.getClassLoader()
+    private void loadApplicationProperties() {
+        try (InputStream in = ServiceManager.class.getClassLoader()
                 .getResourceAsStream("application.properties")) {
             applicationProperties.load(in);
         } catch (IOException e) {
@@ -80,7 +79,7 @@ public class ServiceManager {
         }
     }
 
-    private BasicDataSource createDataSource(){
+    private BasicDataSource createDataSource() {
         BasicDataSource dataSource = new BasicDataSource();
         dataSource.setDefaultAutoCommit(false);
         dataSource.setRollbackOnReturn(true);
