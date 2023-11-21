@@ -1,6 +1,8 @@
 package com.jshop.service.impl;
 
 import com.jshop.framework.factory.JDBCTransactionalServiceFactory;
+import com.jshop.repository.*;
+import com.jshop.repository.impl.*;
 import com.jshop.service.OrderService;
 import com.jshop.service.ProductService;
 import com.jshop.service.SocialService;
@@ -18,11 +20,6 @@ import java.util.Properties;
 
 public class ServiceManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(ServiceManager.class);
-    private final Properties applicationProperties = new Properties();
-    private final ProductService productService;
-    private final OrderService orderService;
-    private final SocialService socialService;
-    private final BasicDataSource dataSource;
 
     public static ServiceManager getInstance(ServletContext context) {
         ServiceManager instance = (ServiceManager) context.getAttribute("SERVICE_MANAGER");
@@ -31,22 +28,6 @@ public class ServiceManager {
             context.setAttribute("SERVICE_MANAGER", instance);
         }
         return instance;
-    }
-
-    private ServiceManager(ServletContext context) {
-        loadApplicationProperties();
-        dataSource = createDataSource();
-        productService = (ProductService) JDBCTransactionalServiceFactory.createTransactionalService(dataSource, new ProductServiceImpl()) ;
-        orderService = (OrderService) JDBCTransactionalServiceFactory.createTransactionalService(dataSource, new OrderServiceImpl(this));
-        socialService = new GoogleSocialService(this);
-    }
-
-    public void close() {
-        try {
-            dataSource.close();
-        } catch (SQLException e) {
-            LOGGER.error("Close datasource failed: " + e.getMessage(), e);
-        }
     }
 
     public ProductService getProductService() {
@@ -70,13 +51,42 @@ public class ServiceManager {
         return value;
     }
 
-    private void loadApplicationProperties() {
-        try (InputStream in = ServiceManager.class.getClassLoader()
-                .getResourceAsStream("application.properties")) {
-            applicationProperties.load(in);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+    public void close() {
+        try {
+            dataSource.close();
+        } catch (SQLException e) {
+            LOGGER.error("Close datasource failed: " + e.getMessage(), e);
         }
+    }
+
+    final Properties applicationProperties = new Properties();
+    final BasicDataSource dataSource;
+    final ProductRepository productRepository;
+    final ProducerRepository producerRepository;
+    final CategoryRepository categoryRepository;
+    final AccountRepository accountRepository;
+    final OrderItemRepository orderItemRepository;
+    final OrderRepository orderRepository;
+
+    private final ProductService productService;
+    private final OrderService orderService;
+    private final SocialService socialService;
+
+
+    private ServiceManager(ServletContext context) {
+        loadApplicationProperties();
+        dataSource = createDataSource();
+
+        productRepository = new ProductRepositoryImpl();
+        producerRepository = new ProducerRepositoryImpl();
+        categoryRepository = new CategoryRepositoryImpl();
+        accountRepository = new AccountRepositoryImpl();
+        orderRepository = new OrderRepositoryImpl();
+        orderItemRepository = new OrderItemRepositoryImpl();
+
+        productService = (ProductService) JDBCTransactionalServiceFactory.createTransactionalService(dataSource, new ProductServiceImpl(this)) ;
+        orderService = (OrderService) JDBCTransactionalServiceFactory.createTransactionalService(dataSource, new OrderServiceImpl(this));
+        socialService = new GoogleSocialService(this);
     }
 
     private BasicDataSource createDataSource() {
@@ -91,4 +101,14 @@ public class ServiceManager {
         dataSource.setMaxTotal(Integer.parseInt(getApplicationProperty("db.pool.maxSize")));
         return dataSource;
     }
+
+    private void loadApplicationProperties() {
+        try (InputStream in = ServiceManager.class.getClassLoader()
+                .getResourceAsStream("application.properties")) {
+            applicationProperties.load(in);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }

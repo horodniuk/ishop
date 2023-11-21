@@ -6,17 +6,19 @@ import com.jshop.framework.annotation.jdbc.Column;
 public class OrderItem extends AbstractEntity<Long>{
     @Column("id_order")
     private Long idOrder;
-    @Child(columnName="pid")
+    @Child(columnName="id_product")
     private Product product;
     private Integer count;
 
-    public OrderItem(Product product, int count) {
+    public OrderItem(Long idOrder, Product product, Integer count) {
         super();
+        this.idOrder = idOrder;
         this.product = product;
         this.count = count;
     }
 
     public OrderItem() {
+        super();
     }
 
     public Long getIdOrder() {
