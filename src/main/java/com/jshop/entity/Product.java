@@ -1,9 +1,11 @@
 package com.jshop.entity;
 
 import com.jshop.framework.annotation.jdbc.Column;
+import com.jshop.framework.annotation.jdbc.Table;
 
 import java.math.BigDecimal;
 
+@Table(name="product")
 public class Product extends AbstractEntity<Integer> {
     private String name;
     private String description;

@@ -1,4 +1,4 @@
-package com.jshop.jdbc;
+package com.jshop.framework;
 
 import java.util.List;
 

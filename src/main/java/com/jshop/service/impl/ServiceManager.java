@@ -1,8 +1,8 @@
 package com.jshop.service.impl;
 
+import com.jshop.framework.factory.JDBCRepositoryFactory;
 import com.jshop.framework.factory.JDBCTransactionalServiceFactory;
 import com.jshop.repository.*;
-import com.jshop.repository.impl.*;
 import com.jshop.service.OrderService;
 import com.jshop.service.ProductService;
 import com.jshop.service.SocialService;
@@ -77,12 +77,12 @@ public class ServiceManager {
         loadApplicationProperties();
         dataSource = createDataSource();
 
-        productRepository = new ProductRepositoryImpl();
-        producerRepository = new ProducerRepositoryImpl();
-        categoryRepository = new CategoryRepositoryImpl();
-        accountRepository = new AccountRepositoryImpl();
-        orderRepository = new OrderRepositoryImpl();
-        orderItemRepository = new OrderItemRepositoryImpl();
+        productRepository = JDBCRepositoryFactory.createRepository(ProductRepository.class);
+        producerRepository = JDBCRepositoryFactory.createRepository(ProducerRepository.class);
+        categoryRepository = JDBCRepositoryFactory.createRepository(CategoryRepository.class);
+        accountRepository = JDBCRepositoryFactory.createRepository(AccountRepository.class);
+        orderRepository = JDBCRepositoryFactory.createRepository(OrderRepository.class);
+        orderItemRepository = JDBCRepositoryFactory.createRepository(OrderItemRepository.class);
 
         productService = (ProductService) JDBCTransactionalServiceFactory.createTransactionalService(dataSource, new ProductServiceImpl(this)) ;
         orderService = (OrderService) JDBCTransactionalServiceFactory.createTransactionalService(dataSource, new OrderServiceImpl(this));
@@ -93,6 +93,8 @@ public class ServiceManager {
         BasicDataSource dataSource = new BasicDataSource();
         dataSource.setDefaultAutoCommit(false);
         dataSource.setRollbackOnReturn(true);
+        dataSource.addConnectionProperty("useUnicode", "true");
+        dataSource.addConnectionProperty("characterEncoding", "UTF-8");
         dataSource.setDriverClassName(getApplicationProperty("db.driver"));
         dataSource.setUrl(getApplicationProperty("db.url"));
         dataSource.setUsername(getApplicationProperty("db.username"));

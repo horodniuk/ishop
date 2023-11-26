@@ -1,12 +1,15 @@
 package com.jshop.entity;
 
 import com.jshop.framework.annotation.jdbc.Column;
+import com.jshop.framework.annotation.jdbc.Table;
 import com.jshop.framework.annotation.jdbc.Transient;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.List;
 
+
+@Table(name="\"order\"", nextIdExpression="nextval('order_seq')")
 public class Order extends AbstractEntity<Long>{
     @Column("id_account")
     private Integer idAccount;
