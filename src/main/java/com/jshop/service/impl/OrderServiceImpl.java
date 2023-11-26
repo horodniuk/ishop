@@ -9,12 +9,6 @@ import com.jshop.exception.InternalServerErrorException;
 import com.jshop.exception.ResourceNotFoundException;
 import com.jshop.form.ProductForm;
 import com.jshop.framework.annotation.jdbc.Transactional;
-import com.jshop.framework.factory.JDBCConnectionUtils;
-import com.jshop.framework.handler.DefaultListResultSetHandler;
-import com.jshop.framework.handler.DefaultUniqueResultSetHandler;
-import com.jshop.framework.handler.IntResultSetHandler;
-import com.jshop.framework.handler.ResultSetHandler;
-import com.jshop.jdbc.JDBCUtils;
 import com.jshop.model.CurrentAccount;
 import com.jshop.model.ShoppingCart;
 import com.jshop.model.ShoppingCartItem;
@@ -29,10 +23,7 @@ import org.apache.commons.mail.SimpleEmail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.sql.DataSource;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 public class OrderServiceImpl implements OrderService {
@@ -175,7 +166,7 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public List<Order> listMyOrders(CurrentAccount currentAccount, int page, int limit) {
         int offset = (page - 1) * limit;
-        return orderRepository.listMyOrders(currentAccount.getId(), offset, limit);
+        return orderRepository.listMyOrders(currentAccount.getId(), limit, offset);
     }
 
     @Override

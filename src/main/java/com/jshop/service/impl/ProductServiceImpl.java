@@ -1,18 +1,11 @@
 package com.jshop.service.impl;
 
 import com.jshop.framework.annotation.jdbc.Transactional;
-import com.jshop.framework.factory.JDBCConnectionUtils;
-import com.jshop.framework.handler.DefaultListResultSetHandler;
-import com.jshop.framework.handler.IntResultSetHandler;
-import com.jshop.framework.handler.ResultSetHandler;
 import com.jshop.entity.Category;
 import com.jshop.entity.Producer;
 import com.jshop.entity.Product;
-import com.jshop.exception.InternalServerErrorException;
 import com.jshop.form.SearchForm;
 
-import com.jshop.jdbc.JDBCUtils;
-import com.jshop.jdbc.SearchQuery;
 import com.jshop.repository.CategoryRepository;
 import com.jshop.repository.ProducerRepository;
 import com.jshop.repository.ProductRepository;
@@ -20,10 +13,6 @@ import com.jshop.service.ProductService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -45,13 +34,13 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<Product> listAllProducts(int page, int limit) {
         int offset = (page - 1) * limit;
-        return productRepository.listAllProducts(offset, limit);
+        return productRepository.listAllProducts(limit, offset);
     }
 
     @Override
     public List<Product> listProductsByCategory(String categoryUrl, int page, int limit) {
         int offset = (page - 1) * limit;
-        return productRepository.listProductsByCategory(categoryUrl, offset, limit);
+        return productRepository.listProductsByCategory(categoryUrl, limit, offset);
     }
 
     @Override
@@ -77,7 +66,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<Product> listProductsBySearchForm(SearchForm searchForm, int page, int limit) {
         int offset = (page - 1) * limit;
-        return productRepository.listProductsBySearchForm(searchForm, offset, limit);
+        return productRepository.listProductsBySearchForm(searchForm, limit, offset);
     }
 
     @Override

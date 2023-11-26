@@ -2,7 +2,9 @@ package com.jshop.entity;
 
 import com.jshop.framework.annotation.jdbc.Child;
 import com.jshop.framework.annotation.jdbc.Column;
+import com.jshop.framework.annotation.jdbc.Table;
 
+@Table(name="order_item", nextIdExpression="nextval('order_item_seq')")
 public class OrderItem extends AbstractEntity<Long>{
     @Column("id_order")
     private Long idOrder;

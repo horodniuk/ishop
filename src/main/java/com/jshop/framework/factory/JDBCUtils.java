@@ -1,4 +1,4 @@
-package com.jshop.jdbc;
+package com.jshop.framework.factory;
 
 import com.jshop.framework.exception.FrameworkSystemException;
 import com.jshop.framework.handler.ResultSetHandler;
@@ -9,7 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-public final class JDBCUtils {
+ final class JDBCUtils {
 
     private JDBCUtils() {
     }
@@ -32,7 +32,9 @@ public final class JDBCUtils {
         }
     }
 
-    public static void populateSqlAndParams(StringBuilder sql, List<Object> params, List<Integer> list, String expression) {
+
+
+  /*  public static void populateSqlAndParams(StringBuilder sql, List<Object> params, List<Integer> list, String expression) {
         if (list != null && !list.isEmpty()) {
             sql.append(" and (");
             for (int i = 0; i < list.size(); i++) {
@@ -44,7 +46,7 @@ public final class JDBCUtils {
             }
             sql.append(")");
         }
-    }
+    }*/
 
 
     public static <T> T insert(Connection c, String sql, ResultSetHandler<T> resultSetHandler, Object... parameters) {
@@ -61,7 +63,7 @@ public final class JDBCUtils {
         }
     }
 
-    public static void insertBatch(Connection c, String sql, List<Object[]> parametersList) {
+    /*public static void insertBatch(Connection c, String sql, List<Object[]> parametersList) {
         try (PreparedStatement ps = c.prepareStatement(sql)) {
             for (Object[] parameters : parametersList) {
                 populatePreparedStatement(ps, parameters);
@@ -71,7 +73,7 @@ public final class JDBCUtils {
         } catch (SQLException e) {
             throw new FrameworkSystemException("Can't execute query: "+e.getMessage(), e);
         }
-    }
+    }*/
 
 
 }

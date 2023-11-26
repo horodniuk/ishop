@@ -1,7 +1,9 @@
 package com.jshop.entity;
 
 import com.jshop.framework.annotation.jdbc.Column;
+import com.jshop.framework.annotation.jdbc.Table;
 
+@Table(name="producer")
 public class Producer extends AbstractEntity<Integer>{
     private String name;
 
