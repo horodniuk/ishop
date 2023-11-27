@@ -9,6 +9,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collection;
 
+
+@SuppressWarnings("rawtypes")
 abstract class JDBCAbstractSQLHelper {
     protected final Logger LOGGER = LoggerFactory.getLogger(getClass());
 

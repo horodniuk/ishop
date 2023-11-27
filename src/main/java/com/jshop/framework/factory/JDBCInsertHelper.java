@@ -14,6 +14,8 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
+
+@SuppressWarnings("rawtypes")
 class JDBCInsertHelper extends JDBCAbstractSQLHelper {
     Object insert(Insert insert, Method method, Object[] args) throws IllegalAccessException, InvocationTargetException {
         validateMethodArgs(method, args);
@@ -100,5 +102,4 @@ class JDBCInsertHelper extends JDBCAbstractSQLHelper {
         Object idValue = idField.get(insertedEntity);
         idField.set(entity, idValue);
     }
-
 }

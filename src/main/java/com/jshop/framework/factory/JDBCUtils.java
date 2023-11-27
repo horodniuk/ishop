@@ -14,7 +14,7 @@ import java.util.List;
     private JDBCUtils() {
     }
 
-    public static <T> T select(Connection c, String sql, ResultSetHandler<T> resultSetHandler, Object... parameters) {
+    static <T> T select(Connection c, String sql, ResultSetHandler<T> resultSetHandler, Object... parameters) {
         try (PreparedStatement ps = c.prepareStatement(sql)) {
             populatePreparedStatement(ps, parameters);
             ResultSet rs = ps.executeQuery();
@@ -32,23 +32,6 @@ import java.util.List;
         }
     }
 
-
-
-  /*  public static void populateSqlAndParams(StringBuilder sql, List<Object> params, List<Integer> list, String expression) {
-        if (list != null && !list.isEmpty()) {
-            sql.append(" and (");
-            for (int i = 0; i < list.size(); i++) {
-                sql.append(expression);
-                params.add(list.get(i));
-                if (i != list.size() - 1) {
-                    sql.append(" or ");
-                }
-            }
-            sql.append(")");
-        }
-    }*/
-
-
     public static <T> T insert(Connection c, String sql, ResultSetHandler<T> resultSetHandler, Object... parameters) {
         try (PreparedStatement ps = c.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
             populatePreparedStatement(ps, parameters);
@@ -62,18 +45,4 @@ import java.util.List;
             throw new FrameworkSystemException("Can't execute query: "+e.getMessage(), e);
         }
     }
-
-    /*public static void insertBatch(Connection c, String sql, List<Object[]> parametersList) {
-        try (PreparedStatement ps = c.prepareStatement(sql)) {
-            for (Object[] parameters : parametersList) {
-                populatePreparedStatement(ps, parameters);
-                ps.addBatch();
-            }
-            ps.executeBatch();
-        } catch (SQLException e) {
-            throw new FrameworkSystemException("Can't execute query: "+e.getMessage(), e);
-        }
-    }*/
-
-
 }

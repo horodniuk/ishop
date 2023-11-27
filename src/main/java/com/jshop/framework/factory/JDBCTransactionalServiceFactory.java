@@ -9,10 +9,19 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
-public final class JDBCTransactionalServiceFactory {
-    public static Object createTransactionalService(DataSource dataSource, Object realService) {
+final class JDBCTransactionalServiceFactory {
+   static Object createTransactionalService(DataSource dataSource, Object realService) {
         return Proxy.newProxyInstance(JDBCTransactionalServiceFactory.class.getClassLoader(), realService.getClass().getInterfaces(),
                 new TransactionalServiceInvocationHandler(realService, dataSource));
+    }
+
+    static boolean isTransactionalServiceInvocationHandler(Object invocationHandler) {
+        return invocationHandler.getClass() == TransactionalServiceInvocationHandler.class;
+    }
+
+    static Object getRealService(Object invocationHandler) throws IllegalAccessException {
+        TransactionalServiceInvocationHandler handler = (TransactionalServiceInvocationHandler) invocationHandler;
+        return handler.realService;
     }
 
     private static class TransactionalServiceInvocationHandler implements InvocationHandler {

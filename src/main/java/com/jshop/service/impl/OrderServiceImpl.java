@@ -8,6 +8,9 @@ import com.jshop.exception.AccessDeniedException;
 import com.jshop.exception.InternalServerErrorException;
 import com.jshop.exception.ResourceNotFoundException;
 import com.jshop.form.ProductForm;
+import com.jshop.framework.annotation.Autowired;
+import com.jshop.framework.annotation.Component;
+import com.jshop.framework.annotation.Value;
 import com.jshop.framework.annotation.jdbc.Transactional;
 import com.jshop.model.CurrentAccount;
 import com.jshop.model.ShoppingCart;
@@ -26,33 +29,32 @@ import org.slf4j.LoggerFactory;
 import java.sql.Timestamp;
 import java.util.List;
 
+
+@Component
 public class OrderServiceImpl implements OrderService {
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderServiceImpl.class);
-    private final AccountRepository accountRepository;
-    private final OrderItemRepository orderItemRepository;
-    private final OrderRepository orderRepository;
-    private final ProductRepository productRepository;
 
-    private final String smtpHost;
-    private final String smtpPort;
-    private final String smtpUsername;
-    private final String smtpPassword;
-    private final String host;
-    private final String fromAddress;
+    @Autowired
+    private AccountRepository accountRepository;
+    @Autowired
+    private OrderItemRepository orderItemRepository;
+    @Autowired
+    private OrderRepository orderRepository;
+    @Autowired
+    private ProductRepository productRepository;
 
-    public OrderServiceImpl(ServiceManager serviceManager) {
-        this.smtpHost = serviceManager.getApplicationProperty("email.smtp.server");
-        this.smtpPort = serviceManager.getApplicationProperty("email.smtp.port");
-        this.smtpUsername = serviceManager.getApplicationProperty("email.smtp.username");
-        this.smtpPassword = serviceManager.getApplicationProperty("email.smtp.password");
-        this.host = serviceManager.getApplicationProperty("app.host");
-        this.fromAddress = serviceManager.getApplicationProperty("email.smtp.fromAddress");
-
-        this.accountRepository = serviceManager.accountRepository;
-        this.orderItemRepository = serviceManager.orderItemRepository;
-        this.orderRepository = serviceManager.orderRepository;
-        this.productRepository = serviceManager.productRepository;
-    }
+    @Value("email.smtp.server")
+    private String smtpHost;
+    @Value("email.smtp.port")
+    private String smtpPort;
+    @Value("email.smtp.username")
+    private String smtpUsername;
+    @Value("email.smtp.password")
+    private String smtpPassword;
+    @Value("app.host")
+    private String host;
+    @Value("email.smtp.fromAddress")
+    private String fromAddress;
 
     @Override
     @Transactional
