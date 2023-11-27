@@ -3,10 +3,12 @@ package com.jshop.repository;
 import com.jshop.entity.Order;
 import com.jshop.framework.annotation.jdbc.CollectionItem;
 import com.jshop.framework.annotation.jdbc.Insert;
+import com.jshop.framework.annotation.jdbc.JDBCRepository;
 import com.jshop.framework.annotation.jdbc.Select;
 
 import java.util.List;
 
+@JDBCRepository
 public interface OrderRepository {
 
     @Insert

@@ -8,7 +8,7 @@ import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-public class JDBCTransactionalHelper {
+ class JDBCTransactionalHelper {
     private final Object realService;
     private final DataSource dataSource;
 

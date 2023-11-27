@@ -1,5 +1,7 @@
 package com.jshop.service.impl;
 
+import com.jshop.framework.annotation.Autowired;
+import com.jshop.framework.annotation.Component;
 import com.jshop.framework.annotation.jdbc.Transactional;
 import com.jshop.entity.Category;
 import com.jshop.entity.Producer;
@@ -17,19 +19,14 @@ import java.util.List;
 
 
 @Transactional
+@Component
 public class ProductServiceImpl implements ProductService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ProductServiceImpl.class);
-
-    private final ProductRepository productRepository;
-    private final ProducerRepository producerRepository;
-    private final CategoryRepository categoryRepository;
-
-
-    public ProductServiceImpl(ServiceManager serviceManager) {
-        this.productRepository = serviceManager.productRepository;
-        this.producerRepository = serviceManager.producerRepository;
-        this.categoryRepository = serviceManager.categoryRepository;
-    }
+    @Autowired
+    private ProductRepository productRepository;
+    @Autowired
+    private ProducerRepository producerRepository;
+    @Autowired
+    private CategoryRepository categoryRepository;
 
     @Override
     public List<Product> listAllProducts(int page, int limit) {
@@ -44,11 +41,6 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public int countAllProducts() {
-        return productRepository.countAllProducts();
-    }
-
-    @Override
     public List<Category> listAllCategories() {
         return categoryRepository.listAllCategories();
     }
@@ -56,6 +48,11 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<Producer> listAllProducers() {
         return producerRepository.listAllProducers();
+    }
+
+    @Override
+    public int countAllProducts() {
+        return productRepository.countAllProducts();
     }
 
     @Override
@@ -70,7 +67,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public int countProductsBySearchForm(SearchForm form) {
-        return productRepository.countProductsBySearchForm(form);
+    public int countProductsBySearchForm(SearchForm searchForm) {
+        return productRepository.countProductsBySearchForm(searchForm);
     }
 }

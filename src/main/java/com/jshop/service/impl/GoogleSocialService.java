@@ -1,8 +1,10 @@
-package com.jshop.service.impl.social;
+package com.jshop.service.impl;
 
 import com.google.api.client.googleapis.auth.oauth2.*;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
+import com.jshop.framework.annotation.Component;
+import com.jshop.framework.annotation.Value;
 import com.jshop.model.SocialAccount;
 import com.jshop.service.SocialService;
 import com.jshop.service.impl.ServiceManager;
@@ -10,21 +12,27 @@ import com.jshop.service.impl.ServiceManager;
 import java.io.IOException;
 import java.util.Arrays;
 
+@Component
 public class GoogleSocialService implements SocialService {
-    private final String idClient;
-    private final String secret;
-    private final String redirectUrl;
 
-    public GoogleSocialService(ServiceManager serviceManager) {
-        idClient = serviceManager.getApplicationProperty("social.google.clientId");
-        secret = serviceManager.getApplicationProperty("social.google.clientSecret");
-        redirectUrl = serviceManager.getApplicationProperty("app.host") + "/login/oauth2/code/google";
+
+    @Value("social.google.clientId")
+    private String idClient;
+
+    @Value("social.google.clientSecret")
+    private String secret;
+
+    @Value("app.host")
+    private String host;
+
+    private String getRedirectUrl(){
+        return host + "/login/oauth2/code/google";
     }
 
     @Override
     public String getAuthorizeUrl() {
         GoogleAuthorizationCodeRequestUrl urlBuilder = new GoogleAuthorizationCodeRequestUrl(
-                 idClient, redirectUrl, Arrays.asList("openid", "email", "profile"))
+                 idClient, getRedirectUrl(), Arrays.asList("openid", "email", "profile"))
                 .setAccessType("offline")
                 .setApprovalPrompt("force");
         return urlBuilder.build();
@@ -39,22 +47,19 @@ public class GoogleSocialService implements SocialService {
                     idClient,
                     secret,
                     authToken,
-                    redirectUrl
+                    getRedirectUrl()
             ).execute();
 
-            // Assuming the ID token is available in the response
             String idTokenString = tokenResponse.getIdToken();
             GoogleIdToken idToken = GoogleIdToken.parse(JacksonFactory.getDefaultInstance(), idTokenString);
 
-            // Extract user information from the ID token
             String email = idToken.getPayload().getEmail();
             String name = (String) idToken.getPayload().get("name");
 
             return new SocialAccount(name, email);
 
         } catch (IOException e) {
-            // Handle exceptions appropriately
-            e.printStackTrace(); // Logging or throw a custom exception
+            e.printStackTrace();
             return null;
         }
     }

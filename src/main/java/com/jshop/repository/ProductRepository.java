@@ -3,12 +3,14 @@ package com.jshop.repository;
 import com.jshop.entity.Product;
 import com.jshop.form.SearchForm;
 import com.jshop.framework.annotation.jdbc.CollectionItem;
+import com.jshop.framework.annotation.jdbc.JDBCRepository;
 import com.jshop.framework.annotation.jdbc.Select;
 import com.jshop.repository.buider.CountProductsSearchFormSQLBuilder;
 import com.jshop.repository.buider.ListProductsSearchFormSQLBuilder;
 
 import java.util.List;
 
+@JDBCRepository
 public interface ProductRepository {
     @Select("select p.*, c.name as category, pr.name as producer from product p, producer pr, category c where c.id=p.id_category and pr.id=p.id_producer limit ? offset ?")
     @CollectionItem(Product.class)

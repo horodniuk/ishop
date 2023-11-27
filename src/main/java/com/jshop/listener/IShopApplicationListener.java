@@ -23,7 +23,7 @@ public class IShopApplicationListener implements ServletContextListener {
             sce.getServletContext().setAttribute(Constants.PRODUCER_LIST, serviceManager.getProductService().listAllProducers());
         } catch (RuntimeException e) {
             LOGGER.error("Web application 'ishop' init failed: "+e.getMessage(), e);
-            e.printStackTrace();
+            throw e;
         }
         LOGGER.info("Web application 'ishop' initialized");
     }
