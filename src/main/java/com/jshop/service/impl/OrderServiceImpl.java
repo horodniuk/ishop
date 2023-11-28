@@ -12,6 +12,8 @@ import com.jshop.framework.annotation.Autowired;
 import com.jshop.framework.annotation.Component;
 import com.jshop.framework.annotation.Value;
 import com.jshop.framework.annotation.jdbc.Transactional;
+import com.jshop.framework.factory.TransactionSynchronization;
+import com.jshop.framework.factory.TransactionSynchronizationManager;
 import com.jshop.model.CurrentAccount;
 import com.jshop.model.ShoppingCart;
 import com.jshop.model.ShoppingCartItem;
@@ -20,6 +22,8 @@ import com.jshop.repository.AccountRepository;
 import com.jshop.repository.OrderItemRepository;
 import com.jshop.repository.OrderRepository;
 import com.jshop.repository.ProductRepository;
+import com.jshop.service.CookieService;
+import com.jshop.service.NotificationService;
 import com.jshop.service.OrderService;
 import org.apache.commons.mail.DefaultAuthenticator;
 import org.apache.commons.mail.SimpleEmail;
@@ -42,19 +46,12 @@ public class OrderServiceImpl implements OrderService {
     private OrderRepository orderRepository;
     @Autowired
     private ProductRepository productRepository;
+    @Autowired
+    private CookieService cookieService;
+    @Autowired
+    private NotificationService notificationService;
 
-    @Value("email.smtp.server")
-    private String smtpHost;
-    @Value("email.smtp.port")
-    private String smtpPort;
-    @Value("email.smtp.username")
-    private String smtpUsername;
-    @Value("email.smtp.password")
-    private String smtpPassword;
-    @Value("app.host")
-    private String host;
-    @Value("email.smtp.fromAddress")
-    private String fromAddress;
+
 
     @Override
     @Transactional
@@ -73,27 +70,17 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public String serializeShoppingCart(ShoppingCart shoppingCart) {
-        StringBuilder res = new StringBuilder();
-        for (ShoppingCartItem item : shoppingCart.getItems()) {
-            res.append(item.getProduct().getId()).append("-").append(item.getCount()).append("|");
-        }
-        if (res.length() > 0) {
-            res.deleteCharAt(res.length() - 1);
-        }
-        return res.toString();
+        return cookieService.createShoppingCartCookie(shoppingCart.getItems());
     }
 
     @Override
     @Transactional
-    public ShoppingCart deserializeShoppingCart(String string) {
+    public ShoppingCart deserializeShoppingCart(String cookieValue) {
         ShoppingCart shoppingCart = new ShoppingCart();
-        String[] items = string.split("\\|");
-        for (String item : items) {
+        List<ProductForm> list = cookieService.parseShoppingCartCookie(cookieValue);
+        for (ProductForm item : list) {
             try {
-                String data[] = item.split("-");
-                int idProduct = Integer.parseInt(data[0]);
-                int count = Integer.parseInt(data[1]);
-                addProductToShoppingCart(new ProductForm(idProduct, count), shoppingCart);
+                addProductToShoppingCart(item, shoppingCart);
             } catch (RuntimeException e) {
                 LOGGER.error("Can't add product to ShoppingCart during deserialization: item=" + item, e);
             }
@@ -119,34 +106,20 @@ public class OrderServiceImpl implements OrderService {
         Order order = new Order(currentAccount.getId(), new Timestamp(System.currentTimeMillis()));
         orderRepository.create(order);
         for (ShoppingCartItem item : shoppingCart.getItems()) {
-            OrderItem tempOrder = new OrderItem(order.getId(), item.getProduct(), item.getCount());
-            orderItemRepository.create(tempOrder);
+            orderItemRepository.create(new OrderItem(order.getId(), item.getProduct(), item.getCount()));
         }
-        // sendEmail(currentAccount.getEmail(), order);
+
+    /**
+     *  send order by client
+     */
+     /* TransactionSynchronizationManager.addSynchronization(() ->
+                notificationService.sendNewOrderCreatedNotification(currentAccount.getEmail(), order));*/
         return order.getId();
     }
 
     private void validateShoppingCart (ShoppingCart shoppingCart) {
         if (shoppingCart == null || shoppingCart.getItems().isEmpty()) {
             throw new InternalServerErrorException("shoppingCart is null or empty");
-        }
-    }
-
-    private void sendEmail(String emailAddress, Order order) {
-        try {
-            SimpleEmail email = new SimpleEmail();
-            email.setCharset("utf-8");
-            email.setHostName(smtpHost);
-            email.setSSLOnConnect(true);
-            email.setSslSmtpPort(smtpPort);
-            email.setFrom(fromAddress);
-            email.setAuthenticator(new DefaultAuthenticator(smtpUsername, smtpPassword));
-            email.setSubject("New order");
-            email.setMsg(host + "/order?id=" + order.getId());
-            email.addTo(emailAddress);
-            email.send();
-        } catch (Exception e) {
-            LOGGER.error("Error during send email: " + e.getMessage(), e);
         }
     }
 
