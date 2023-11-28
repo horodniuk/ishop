@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.net.URL;
@@ -82,6 +83,9 @@ import com.jshop.framework.utils.ReflectionUtils;
         }
 
         public void destroyInstances() {
+            for (Object instance : instances.values()) {
+                destroyInstance(instance);
+            }
             instances.clear();
         }
 
@@ -219,6 +223,21 @@ import com.jshop.framework.utils.ReflectionUtils;
                     }
                 }
                 return false;
+            }
+        }
+
+        protected void destroyInstance(Object instance) {
+            Method[] methods = instance.getClass().getDeclaredMethods();
+            for (Method method : methods) {
+                if (method.getName().equals("close") && method.getParameterCount() == 0) {
+                    LOGGER.info("Invoke close method from class {}", instance.getClass().getSimpleName());
+                    try {
+                        method.setAccessible(true);
+                        method.invoke(instance);
+                    } catch (IllegalAccessException | InvocationTargetException | IllegalArgumentException e) {
+                        LOGGER.error("Invoke close method failed: " + e.getMessage(), e);
+                    }
+                }
             }
         }
 }
