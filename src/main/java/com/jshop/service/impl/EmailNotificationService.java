@@ -27,8 +27,6 @@ public class EmailNotificationService implements NotificationService {
     private String smtpUsername;
     @Value("email.smtp.password")
     private String smtpPassword;
-    @Value("app.host")
-    private String host;
     @Value("email.smtp.fromAddress")
     private String fromEmail;
     @Value("email.smtp.tryCount")
@@ -38,13 +36,8 @@ public class EmailNotificationService implements NotificationService {
         executorService = Executors.newCachedThreadPool();
     }
 
-    protected String buildNotificationMessage(Order order) {
-        return host + "/order?id=" + order.getId();
-    }
-
     @Override
-    public void sendNewOrderCreatedNotification(String notificationAddress, Order order) {
-        String content = buildNotificationMessage(order);
+    public void sendNotificationMessage(String notificationAddress, String content) {
         executorService.submit(
                    new EmailItem(notificationAddress,
                         "New order",

@@ -23,6 +23,7 @@ import com.jshop.repository.OrderItemRepository;
 import com.jshop.repository.OrderRepository;
 import com.jshop.repository.ProductRepository;
 import com.jshop.service.CookieService;
+import com.jshop.service.NotificationContentBuilderService;
 import com.jshop.service.NotificationService;
 import com.jshop.service.OrderService;
 import org.apache.commons.mail.DefaultAuthenticator;
@@ -50,6 +51,8 @@ public class OrderServiceImpl implements OrderService {
     private CookieService cookieService;
     @Autowired
     private NotificationService notificationService;
+    @Autowired
+    private NotificationContentBuilderService notificationContentBuilderService;
 
 
 
@@ -112,8 +115,10 @@ public class OrderServiceImpl implements OrderService {
     /**
      *  send order by client
      */
-     /* TransactionSynchronizationManager.addSynchronization(() ->
-                notificationService.sendNewOrderCreatedNotification(currentAccount.getEmail(), order));*/
+         TransactionSynchronizationManager.addSynchronization(() -> {
+            String content = notificationContentBuilderService.buildNewOrderCreatedNotificationMessage(order);
+            notificationService.sendNotificationMessage(currentAccount.getEmail(), content);
+        });
         return order.getId();
     }
 
