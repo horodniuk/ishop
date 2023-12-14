@@ -1,12 +1,16 @@
 package com.jshop.filter;
 
 
-import jakarta.servlet.*;
-import jakarta.servlet.annotation.WebFilter;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpServletResponseWrapper;
 
+
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.WriteListener;
+import javax.servlet.annotation.WebFilter;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletResponseWrapper;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
@@ -35,13 +39,14 @@ public class TrimResponseFilter extends AbstractFilter {
         @Override
         public ServletOutputStream getOutputStream() throws IOException {
             return new ServletOutputStream(){
-                @Override
+
                 public boolean isReady() {
                     return false;
                 }
-                @Override
+
                 public void setWriteListener(WriteListener writeListener) {
                 }
+
                 @Override
                 public void write(int b) throws IOException {
                     trimProxyWriter.write(b);

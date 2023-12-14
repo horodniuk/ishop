@@ -5,11 +5,12 @@ import com.jshop.form.ProductForm;
 import com.jshop.model.ShoppingCart;
 import com.jshop.util.RoutingUtils;
 import com.jshop.util.SessionUtils;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+
 import org.json.JSONObject;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 public abstract class AbstractProductController extends AbstractController {

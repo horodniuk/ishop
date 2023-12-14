@@ -3,14 +3,14 @@ package com.jshop.filter;
 
 import com.jshop.config.Constants;
 import com.jshop.service.ProductService;
-import com.jshop.service.impl.ServiceManager;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.FilterConfig;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebFilter;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import com.jshop.util.SpringUtils;
 
+
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 // not working, use annotation @WebFilter
@@ -19,7 +19,7 @@ public class CategoryProducerFilter extends AbstractFilter {
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
-       productService = ServiceManager.getInstance(filterConfig.getServletContext()).getProductService();
+        productService = SpringUtils.getInstance(filterConfig.getServletContext(), ProductService.class);
     }
 
     @Override

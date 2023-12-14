@@ -8,12 +8,8 @@ import com.jshop.exception.AccessDeniedException;
 import com.jshop.exception.InternalServerErrorException;
 import com.jshop.exception.ResourceNotFoundException;
 import com.jshop.form.ProductForm;
-import com.jshop.framework.annotation.Autowired;
-import com.jshop.framework.annotation.Component;
-import com.jshop.framework.annotation.Value;
-import com.jshop.framework.annotation.jdbc.Transactional;
-import com.jshop.framework.factory.TransactionSynchronization;
-import com.jshop.framework.factory.TransactionSynchronizationManager;
+
+
 import com.jshop.model.CurrentAccount;
 import com.jshop.model.ShoppingCart;
 import com.jshop.model.ShoppingCartItem;
@@ -26,16 +22,25 @@ import com.jshop.service.CookieService;
 import com.jshop.service.NotificationContentBuilderService;
 import com.jshop.service.NotificationService;
 import com.jshop.service.OrderService;
-import org.apache.commons.mail.DefaultAuthenticator;
-import org.apache.commons.mail.SimpleEmail;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronizationAdapter;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
+
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Optional;
 
 
-@Component
+@Service
 public class OrderServiceImpl implements OrderService {
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderServiceImpl.class);
 
@@ -54,16 +59,17 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private NotificationContentBuilderService notificationContentBuilderService;
 
-
-
     @Override
-    @Transactional
+    @Transactional(readOnly=true)
     public void addProductToShoppingCart(ProductForm productForm, ShoppingCart shoppingCart) {
-        Product product = productRepository.findById(productForm.getIdProduct());
-        if (product == null) {
+        Optional<Product> optionalProduct = productRepository.findById(productForm.getIdProduct());
+
+        if (optionalProduct.isPresent()) {
+            Product product = optionalProduct.get();
+            shoppingCart.addProduct(product, productForm.getCount());
+        } else {
             throw new InternalServerErrorException("Product not found by id=" + productForm.getIdProduct());
         }
-        shoppingCart.addProduct(product, productForm.getCount());
     }
 
     @Override
@@ -77,7 +83,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly=true)
     public ShoppingCart deserializeShoppingCart(String cookieValue) {
         ShoppingCart shoppingCart = new ShoppingCart();
         List<ProductForm> list = cookieService.parseShoppingCartCookie(cookieValue);
@@ -92,32 +98,35 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    @Transactional(readOnly=false)
+    @Transactional
     public CurrentAccount authentificate(SocialAccount socialAccount) {
         Account account = accountRepository.findByEmail(socialAccount.getEmail());
             if (account == null) {
                 account = new Account(socialAccount.getName(), socialAccount.getEmail());
-                accountRepository.create(account);
+                accountRepository.save(account);
             }
             return account;
     }
 
     @Override
-    @Transactional(readOnly=false)
+    @Transactional
     public long makeOrder(ShoppingCart shoppingCart, CurrentAccount currentAccount) {
         validateShoppingCart(shoppingCart);
         Order order = new Order(currentAccount.getId(), new Timestamp(System.currentTimeMillis()));
-        orderRepository.create(order);
+        orderRepository.save(order);
         for (ShoppingCartItem item : shoppingCart.getItems()) {
-            orderItemRepository.create(new OrderItem(order.getId(), item.getProduct(), item.getCount()));
+            orderItemRepository.save(new OrderItem(order.getId(), item.getProduct(), item.getCount()));
         }
 
     /**
      *  send order by client
      */
-         TransactionSynchronizationManager.addSynchronization(() -> {
-            String content = notificationContentBuilderService.buildNewOrderCreatedNotificationMessage(order);
-            notificationService.sendNotificationMessage(currentAccount.getEmail(), content);
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
+            @Override
+            public void afterCommit() {
+                String content = notificationContentBuilderService.buildNewOrderCreatedNotificationMessage(order);
+                notificationService.sendNotificationMessage(currentAccount.getEmail(), content);
+            }
         });
         return order.getId();
     }
@@ -129,9 +138,9 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly=true)
     public Order findOrderById(long id, CurrentAccount currentAccount) {
-        Order order = orderRepository.findById(id);
+        Order order = orderRepository.findById(id).get();
         if (order == null) {
             throw new ResourceNotFoundException("Order not found by id: " + id);
         }
@@ -143,15 +152,15 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly=true)
     public List<Order> listMyOrders(CurrentAccount currentAccount, int page, int limit) {
-        int offset = (page - 1) * limit;
-        return orderRepository.listMyOrders(currentAccount.getId(), limit, offset);
+        Pageable pageable = PageRequest.of(page - 1, limit);
+        return orderRepository.findByIdAccount(currentAccount.getId(), pageable);
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly=true)
     public int countMyOrders(CurrentAccount currentAccount) {
-        return orderRepository.countMyOrders(currentAccount.getId());
+        return orderRepository.countByIdAccount(currentAccount.getId());
     }
 }

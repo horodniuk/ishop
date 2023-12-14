@@ -1,17 +1,17 @@
 package com.jshop.service.impl;
 
 import com.jshop.form.ProductForm;
-import com.jshop.framework.annotation.Component;
 import com.jshop.model.ShoppingCartItem;
 import com.jshop.service.CookieService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-@Component
+@Service
 public class CookieServiceImpl implements CookieService {
     private static final Logger LOGGER = LoggerFactory.getLogger(CookieServiceImpl.class);
 

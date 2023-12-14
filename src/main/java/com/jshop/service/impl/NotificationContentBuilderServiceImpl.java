@@ -1,13 +1,15 @@
 package com.jshop.service.impl;
 
 import com.jshop.entity.Order;
-import com.jshop.framework.annotation.Component;
-import com.jshop.framework.annotation.Value;
-import com.jshop.service.NotificationContentBuilderService;
 
-@Component
+
+import com.jshop.service.NotificationContentBuilderService;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+@Service
 public class NotificationContentBuilderServiceImpl implements NotificationContentBuilderService {
-    @Value("app.host")
+    @Value("${app.host}")
     private String host;
 
     @Override

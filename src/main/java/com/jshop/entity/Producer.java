@@ -1,16 +1,25 @@
 package com.jshop.entity;
 
-import com.jshop.framework.annotation.jdbc.Column;
-import com.jshop.framework.annotation.jdbc.Table;
 
-@Table(name="producer")
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "producer")
 public class Producer extends AbstractEntity<Integer>{
+    @Id
+    private Integer id;
     private String name;
 
-    @Column("product_count")
+    @Column(name = "product_count")
     private Integer productCount;
 
     public Producer() {
+    }
+    public Integer getId() {
+        return id;
     }
 
     public String getName() {

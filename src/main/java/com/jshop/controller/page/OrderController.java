@@ -6,11 +6,12 @@ import com.jshop.entity.Order;
 import com.jshop.model.ShoppingCart;
 import com.jshop.util.RoutingUtils;
 import com.jshop.util.SessionUtils;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @WebServlet("/order")
