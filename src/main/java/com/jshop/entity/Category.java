@@ -1,16 +1,26 @@
 package com.jshop.entity;
 
-import com.jshop.framework.annotation.jdbc.Column;
-import com.jshop.framework.annotation.jdbc.Table;
 
-@Table(name="category")
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "category")
 public class Category extends AbstractEntity<Integer> {
+    @Id
+    private Integer id;
     private String name;
     private String url;
-    @Column("product_count")
+    @Column(name = "product_count")
     private Integer productCount;
 
     public Category() {
+    }
+
+    public Integer getId() {
+        return id;
     }
 
     public String getName() {

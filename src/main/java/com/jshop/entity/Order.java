@@ -1,17 +1,20 @@
 package com.jshop.entity;
 
-import com.jshop.framework.annotation.jdbc.Column;
-import com.jshop.framework.annotation.jdbc.Table;
-import com.jshop.framework.annotation.jdbc.Transient;
 
+
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.List;
 
-
-@Table(name="\"order\"", nextIdExpression="nextval('order_seq')")
+@Entity
+@Table(name = "\"order\"")
 public class Order extends AbstractEntity<Long>{
-    @Column("id_account")
+    @Id
+    @SequenceGenerator(name = "order_seq_generator", sequenceName = "order_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "order_seq_generator")
+    private Long id;
+    @Column(name = "id_account")
     private Integer idAccount;
     @Transient
     private List<OrderItem> items;
@@ -24,6 +27,10 @@ public class Order extends AbstractEntity<Long>{
     }
 
     public Order() {
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public Integer getIdAccount() {

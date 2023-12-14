@@ -3,26 +3,25 @@ package com.jshop.service.impl;
 import com.google.api.client.googleapis.auth.oauth2.*;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
-import com.jshop.framework.annotation.Component;
-import com.jshop.framework.annotation.Value;
+
 import com.jshop.model.SocialAccount;
 import com.jshop.service.SocialService;
-import com.jshop.service.impl.ServiceManager;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.Arrays;
 
-@Component
+@Service
 public class GoogleSocialService implements SocialService {
 
-
-    @Value("social.google.clientId")
+    @Value("${social.google.clientId}")
     private String idClient;
 
-    @Value("social.google.clientSecret")
+    @Value("${social.google.clientSecret}")
     private String secret;
 
-    @Value("app.host")
+    @Value("${app.host}")
     private String host;
 
     private String getRedirectUrl(){

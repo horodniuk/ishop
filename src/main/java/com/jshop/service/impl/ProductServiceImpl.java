@@ -1,8 +1,8 @@
 package com.jshop.service.impl;
 
-import com.jshop.framework.annotation.Autowired;
-import com.jshop.framework.annotation.Component;
-import com.jshop.framework.annotation.jdbc.Transactional;
+
+
+
 import com.jshop.entity.Category;
 import com.jshop.entity.Producer;
 import com.jshop.entity.Product;
@@ -12,13 +12,19 @@ import com.jshop.repository.CategoryRepository;
 import com.jshop.repository.ProducerRepository;
 import com.jshop.repository.ProductRepository;
 import com.jshop.service.ProductService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 import java.util.List;
 
 
-@Transactional
-@Component
+@Transactional(readOnly=true)
+@Service
 public class ProductServiceImpl implements ProductService {
     @Autowired
     private ProductRepository productRepository;
@@ -29,40 +35,40 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<Product> listAllProducts(int page, int limit) {
-        int offset = (page - 1) * limit;
-        return productRepository.listAllProducts(limit, offset);
+        Pageable pageable = PageRequest.of(page - 1, limit);
+        return productRepository.findAll(pageable).getContent();
     }
 
     @Override
     public List<Product> listProductsByCategory(String categoryUrl, int page, int limit) {
-        int offset = (page - 1) * limit;
-        return productRepository.listProductsByCategory(categoryUrl, limit, offset);
+        Pageable pageable = PageRequest.of(page - 1, limit);
+        return productRepository.findByCategoryUrl(categoryUrl,pageable);
     }
 
     @Override
     public List<Category> listAllCategories() {
-        return categoryRepository.listAllCategories();
+        return categoryRepository.findAll(Sort.by(Sort.Order.asc("id")));
     }
 
     @Override
     public List<Producer> listAllProducers() {
-        return producerRepository.listAllProducers();
+        return producerRepository.findAll(Sort.by(Sort.Order.asc("name")));
     }
 
     @Override
     public int countAllProducts() {
-        return productRepository.countAllProducts();
+        return (int)productRepository.count();
     }
 
     @Override
     public int countProductsByCategory(String categoryUrl) {
-        return productRepository.countProductsByCategory(categoryUrl);
+        return productRepository.countByCategoryUrl(categoryUrl);
     }
 
     @Override
     public List<Product> listProductsBySearchForm(SearchForm searchForm, int page, int limit) {
-        int offset = (page - 1) * limit;
-        return productRepository.listProductsBySearchForm(searchForm, limit, offset);
+        Pageable pageable = PageRequest.of(page - 1, limit);
+        return productRepository.listProductsBySearchForm(searchForm, pageable);
     }
 
     @Override

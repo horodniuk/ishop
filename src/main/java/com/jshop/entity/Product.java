@@ -1,21 +1,35 @@
 package com.jshop.entity;
 
-import com.jshop.framework.annotation.jdbc.Column;
-import com.jshop.framework.annotation.jdbc.Table;
 
+
+import javax.persistence.*;
 import java.math.BigDecimal;
 
+
+@Entity
 @Table(name="product")
 public class Product extends AbstractEntity<Integer> {
+    @Id
+    private Integer id;
     private String name;
     private String description;
-    @Column("image_link")
+    @Column(name = "image_link")
     private String imageLink;
     private BigDecimal price;
-    private String category;
-    private String producer;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "id_category", nullable = false)
+    private Category category;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "id_producer", nullable = false)
+    private Producer producer;
 
     public Product() {
+    }
+
+    public Integer getId() {
+        return id;
     }
 
     public String getName() {
@@ -51,18 +65,18 @@ public class Product extends AbstractEntity<Integer> {
     }
 
     public String getCategory() {
-        return category;
+        return category.getName();
     }
 
-    public void setCategory(String category) {
+    public void setCategory(Category category) {
         this.category = category;
     }
 
     public String getProducer() {
-        return producer;
+        return producer.getName();
     }
 
-    public void setProducer(String producer) {
+    public void setProducer(Producer producer) {
         this.producer = producer;
     }
 

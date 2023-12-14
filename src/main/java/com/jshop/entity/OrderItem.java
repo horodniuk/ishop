@@ -1,14 +1,21 @@
 package com.jshop.entity;
 
-import com.jshop.framework.annotation.jdbc.Child;
-import com.jshop.framework.annotation.jdbc.Column;
-import com.jshop.framework.annotation.jdbc.Table;
 
-@Table(name="order_item", nextIdExpression="nextval('order_item_seq')")
+
+
+import javax.persistence.*;
+
+@Entity
+@Table(name = "order_item")
 public class OrderItem extends AbstractEntity<Long>{
-    @Column("id_order")
+    @Id
+    @SequenceGenerator(name = "order_item_seq_generator", sequenceName = "order_item_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "order_item_seq_generator")
+    private Long id;
+    @Column(name = "id_order")
     private Long idOrder;
-    @Child(columnName="id_product")
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "id_product", nullable = false)
     private Product product;
     private Integer count;
 
@@ -21,6 +28,10 @@ public class OrderItem extends AbstractEntity<Long>{
 
     public OrderItem() {
         super();
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public Long getIdOrder() {

@@ -2,10 +2,11 @@ package com.jshop.listener;
 
 
 import com.jshop.config.Constants;
-import jakarta.servlet.annotation.WebListener;
-import jakarta.servlet.http.HttpSessionEvent;
-import jakarta.servlet.http.HttpSessionListener;
 
+
+import javax.servlet.annotation.WebListener;
+import javax.servlet.http.HttpSessionEvent;
+import javax.servlet.http.HttpSessionListener;
 import java.util.List;
 
 @WebListener

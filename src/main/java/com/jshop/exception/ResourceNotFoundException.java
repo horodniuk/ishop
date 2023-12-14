@@ -1,6 +1,7 @@
 package com.jshop.exception;
 
-import jakarta.servlet.http.HttpServletResponse;
+
+import javax.servlet.http.HttpServletResponse;
 
 public class ResourceNotFoundException extends AbstractApplicationException {
 

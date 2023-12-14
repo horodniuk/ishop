@@ -5,13 +5,14 @@ import com.jshop.form.SearchForm;
 import com.jshop.service.OrderService;
 import com.jshop.service.ProductService;
 import com.jshop.service.SocialService;
-import com.jshop.service.impl.ServiceManager;
-import jakarta.servlet.Servlet;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
+
+import com.jshop.util.SpringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
 
 public abstract class AbstractController extends HttpServlet {
     protected final Logger LOGGER = LoggerFactory.getLogger(getClass());
@@ -22,9 +23,9 @@ public abstract class AbstractController extends HttpServlet {
 
     @Override
     public final void init() throws ServletException {
-        productService = ServiceManager.getInstance(getServletContext()).getProductService();
-        orderService = ServiceManager.getInstance(getServletContext()).getOrderService();
-        socialService = ServiceManager.getInstance(getServletContext()).getSocialService();
+        productService = SpringUtils.getInstance(getServletContext(), ProductService.class);
+        orderService =  SpringUtils.getInstance(getServletContext(), OrderService.class);
+        socialService = SpringUtils.getInstance(getServletContext(), SocialService.class);
     }
 
     public final ProductService getProductService() {

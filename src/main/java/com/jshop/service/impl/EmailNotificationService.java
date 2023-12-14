@@ -1,35 +1,36 @@
 package com.jshop.service.impl;
 
 
-import com.jshop.entity.Order;
-import com.jshop.framework.annotation.Component;
-import com.jshop.framework.annotation.Value;
+
+
 import com.jshop.service.NotificationService;
 import org.apache.commons.mail.DefaultAuthenticator;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.SimpleEmail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@Component
+@Service
 public class EmailNotificationService implements NotificationService {
     private static final Logger LOGGER = LoggerFactory.getLogger(EmailNotificationService.class);
     private final ExecutorService executorService;
 
-    @Value("email.smtp.server")
+    @Value("${email.smtp.server}")
     private String smtpHost;
-    @Value("email.smtp.port")
+    @Value("${email.smtp.port}")
     private String smtpPort;
-    @Value("email.smtp.username")
+    @Value("${email.smtp.username}")
     private String smtpUsername;
-    @Value("email.smtp.password")
+    @Value("${email.smtp.password}")
     private String smtpPassword;
-    @Value("email.smtp.fromAddress")
+    @Value("${email.smtp.fromAddress}")
     private String fromEmail;
-    @Value("email.smtp.tryCount")
+    @Value("${email.smtp.tryCount}")
     private String tryCount;
 
     public EmailNotificationService() {
